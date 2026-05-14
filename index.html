@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>H.E.R LUXURY — Artisan Fragrances</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ══ NAV ══════════════════════════════════════════════ -->
+  <nav id="mainNav">
+    <a class="nav-logo" href="#">H<em>·</em>E<em>·</em>R LUXURY</a>
+    <ul class="nav-links">
+      <li><a href="#collection">Collection</a></li>
+      <li><a href="#about">Maison</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- ══ HERO ══════════════════════════════════════════════ -->
+  <section class="hero">
+
+    <!-- LEFT: text -->
+    <div class="hero-left">
+      <p class="hero-eyebrow">Artisan Perfumery · Est. 2024</p>
+      <h1 class="hero-title">
+        Where <em>scent</em><br>
+        becomes<br>
+        memory
+      </h1>
+      <p class="hero-subtitle">
+        Each bottle holds a world — luminous, warm, and
+        entirely, unmistakably yours.
+      </p>
+      <div class="hero-actions">
+        <a href="#collection" class="btn-hero-primary">Explore Collection</a>
+        <span class="hero-note"><span>6</span> Exclusive Scents</span>
+      </div>
+    </div>
+
+    <!-- RIGHT: image -->
+    <div class="hero-right">
+      <img
+        class="hero-main-image"
+        src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=900&q=80&fit=crop"
+        alt="H.E.R Luxury Fragrances"
+        loading="eager"
+      />
+
+      <!-- floating stat card top-left -->
+      <div class="hero-float-card card-top">
+        <div class="hfc-num" id="heroStatProducts">6</div>
+        <div class="hfc-label">Fragrances</div>
+      </div>
+
+      <!-- floating info card bottom-right -->
+      <div class="hero-float-card card-bottom">
+        <div class="hfc-icon">✦</div>
+        <div class="hfc-body-text">
+          <strong>Handcrafted</strong>
+          Premium ingredients only
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ══ MARQUEE ════════════════════════════════════════════ -->
+  <div class="marquee-strip" aria-hidden="true">
+    <div class="marquee-inner">
+      <span class="marquee-item">Artisan Perfumery</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Handcrafted Luxury</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Bulgarian Rose Absolute</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Cambodian Oud</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">H·E·R Luxury</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Est. 2024</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Artisan Perfumery</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Handcrafted Luxury</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Bulgarian Rose Absolute</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Cambodian Oud</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">H·E·R Luxury</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Est. 2024</span><span class="marquee-sep">◆</span>
+    </div>
+  </div>
+
+  <!-- ══ FEATURED SCENT ════════════════════════════════════ -->
+  <section class="featured-section" id="featured">
+    <div class="featured-inner">
+
+      <div class="featured-image-wrap">
+        <span class="featured-label-tag">Featured Scent</span>
+        <img
+          class="featured-image"
+          src="https://images.unsplash.com/photo-1673441856149-b3a7c3e49af7?w=800&q=80&fit=crop"
+          alt="Golden Hour Fragrance"
+          loading="lazy"
+          id="featuredImage"
+        />
+      </div>
+
+      <div class="featured-content" id="featuredContent">
+        <div class="featured-tag">Collection Lumière</div>
+        <h2 class="featured-name" id="featuredName">Golden Hour</h2>
+        <div class="featured-collection" id="featuredCollectionLabel">Signature · Limited Edition</div>
+        <p class="featured-desc" id="featuredDesc">
+          Capture the last light of day — saffron threads woven through
+          warm sandalwood, settling into a whisper of vanilla musk as
+          dusk falls gently around you.
+        </p>
+        <div class="featured-notes" id="featuredNotes">
+          <span class="featured-note-pill">Saffron</span>
+          <span class="featured-note-pill">Sandalwood</span>
+          <span class="featured-note-pill">Vanilla Musk</span>
+        </div>
+        <div class="featured-price-row">
+          <span class="featured-price" id="featuredPrice">€65</span>
+          <span class="featured-stock" id="featuredStock">In Stock</span>
+        </div>
+        <button
+          class="btn-hero-primary"
+          id="featuredBuyBtn"
+          onclick="openBuyModalById(window._featuredId)"
+        >Purchase This Scent</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ COLLECTION GRID ═══════════════════════════════════ -->
+  <section class="collection-section" id="collection">
+
+    <div class="section-header-row">
+      <div>
+        <div class="section-eyebrow">The Collection</div>
+        <h2 class="section-title">Fragrance as <em>fine art</em></h2>
+      </div>
+      <span class="section-count" id="collectionCount"></span>
+    </div>
+
+    <!-- Collection filter tabs -->
+    <div class="collection-filters" id="collectionFilters">
+      <button class="filter-tab active" onclick="filterCollection('all', this)">All</button>
+      <button class="filter-tab" onclick="filterCollection('Nocturne', this)">Nocturne</button>
+      <button class="filter-tab" onclick="filterCollection('Lumière', this)">Lumière</button>
+      <button class="filter-tab" onclick="filterCollection('Essence', this)">Essence</button>
+    </div>
+
+    <div id="loadingState" style="text-align:center;padding:4rem 0;color:var(--text-muted);font-size:0.7rem;letter-spacing:0.4em;text-transform:uppercase;">
+      Loading collection&hellip;
+    </div>
+    <div class="perfume-grid" id="productGrid" style="display:none;"></div>
+
+  </section>
+
+  <!-- ══ MATERIALS STRIP ═══════════════════════════════════ -->
+  <section class="materials-section">
+    <div style="max-width:1300px;margin:0 auto;">
+      <div class="section-eyebrow">The Ingredients</div>
+      <h2 class="section-title">Sourced from <em>the world's finest</em></h2>
+
+      <div class="materials-grid">
+
+        <div class="material-card">
+          <div class="material-image">
+            <img src="https://images.unsplash.com/photo-1548123378-bde4eca81d2d?w=600&q=75&fit=crop" alt="Bulgarian Rose" loading="lazy" />
+          </div>
+          <div class="material-body">
+            <div class="material-name">Bulgarian Rose</div>
+            <div class="material-origin">Rose Valley, Bulgaria</div>
+          </div>
+        </div>
+
+        <div class="material-card">
+          <div class="material-image">
+            <img src="https://images.unsplash.com/photo-1547522297-51781d82eb9c?w=600&q=75&fit=crop" alt="Oud Wood" loading="lazy" />
+          </div>
+          <div class="material-body">
+            <div class="material-name">Agarwood Oud</div>
+            <div class="material-origin">Cambodian Highlands</div>
+          </div>
+        </div>
+
+        <div class="material-card">
+          <div class="material-image">
+            <img src="https://images.unsplash.com/photo-1536939459926-301ac7ea60d5?w=600&q=75&fit=crop" alt="Saffron" loading="lazy" />
+          </div>
+          <div class="material-body">
+            <div class="material-name">Persian Saffron</div>
+            <div class="material-origin">Khorasan, Iran</div>
+          </div>
+        </div>
+
+        <div class="material-card">
+          <div class="material-image">
+            <img src="https://images.unsplash.com/photo-1611073615830-9b592ad11b82?w=600&q=75&fit=crop" alt="Sandalwood" loading="lazy" />
+          </div>
+          <div class="material-body">
+            <div class="material-name">Mysore Sandalwood</div>
+            <div class="material-origin">Karnataka, India</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ABOUT ══════════════════════════════════════════════ -->
+  <section class="about-section" id="about">
+    <div class="about-inner">
+
+      <!-- Image stack -->
+      <div class="about-image-stack">
+        <img
+          class="about-img-main"
+          src="https://images.unsplash.com/photo-1596516109370-29001ec8ec36?w=700&q=80&fit=crop"
+          alt="H.E.R Luxury atelier"
+          loading="lazy"
+        />
+        <img
+          class="about-img-accent"
+          src="https://images.unsplash.com/photo-1594035910387-fea47794261f?w=500&q=80&fit=crop"
+          alt="Fragrance bottles"
+          loading="lazy"
+        />
+        <div class="about-badge">
+          <span class="about-badge-num">100%</span>
+          <div class="about-badge-label">Handcrafted</div>
+        </div>
+      </div>
+
+      <!-- Text -->
+      <div class="about-text">
+        <div class="section-eyebrow">Our Maison</div>
+        <h2 class="section-title">Crafted with<br><em>obsession</em></h2>
+        <div class="about-divider"></div>
+
+        <p>
+          Every H.E.R Luxury fragrance begins with a single obsession — an emotion,
+          a memory, a fleeting moment of beauty that refuses to be forgotten.
+          We bottle that obsession.
+        </p>
+        <p>
+          Using only the finest raw materials sourced from around the world —
+          Bulgarian rose absolute, aged Cambodian oud, Himalayan cedarwood —
+          each fragrance is built to be a personal landmark.
+        </p>
+        <p>
+          No shortcuts. No compromises. Just pure olfactory art, made for
+          the woman who knows exactly who she is.
+        </p>
+
+        <div class="about-stats">
+          <div>
+            <div class="about-stat-num" id="statProducts">—</div>
+            <div class="about-stat-label">Fragrances</div>
+          </div>
+          <div>
+            <div class="about-stat-num" id="statCollections">—</div>
+            <div class="about-stat-label">Collections</div>
+          </div>
+          <div>
+            <div class="about-stat-num">100%</div>
+            <div class="about-stat-label">Artisan</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ TESTIMONIALS ═══════════════════════════════════════ -->
+  <section class="testimonials-section">
+    <div style="max-width:1300px;margin:0 auto;">
+      <div class="section-eyebrow">What She Says</div>
+      <h2 class="section-title">Worn with <em>devotion</em></h2>
+
+      <div class="testimonials-grid">
+
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">
+            "Golden Hour changed the way I think about fragrance. It isn't just
+            a scent — it's a whole feeling. I wear it every single day."
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">A</div>
+            <div>
+              <div class="testimonial-name">Amara O.</div>
+              <div class="testimonial-location">Lagos, Nigeria</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">
+            "Velvet Noir is everything. Dark, sensual, unforgettable.
+            I've received more compliments in the past month than ever before."
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">S</div>
+            <div>
+              <div class="testimonial-name">Sofia M.</div>
+              <div class="testimonial-location">Paris, France</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">
+            "The quality of these fragrances rivals houses that charge triple
+            the price. Pale Morning is my signature scent now — forever."
+          </p>
+          <div class="testimonial-author">
+            <div class="testimonial-avatar">N</div>
+            <div>
+              <div class="testimonial-name">Natasha K.</div>
+              <div class="testimonial-location">London, UK</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CONTACT ════════════════════════════════════════════ -->
+  <section class="contact-section" id="contact">
+    <div class="section-eyebrow">Inquiries</div>
+    <h2 class="section-title">Let's talk <em>fragrance</em></h2>
+    <p class="contact-desc">
+      For bespoke orders, wholesale inquiries, or simply to talk fragrance —
+      we would love to hear from you.
+    </p>
+    <a href="mailto:hello@herluxury.com" class="contact-email">hello@herluxury.com</a>
+  </section>
+
+  <!-- ══ FOOTER ═════════════════════════════════════════════ -->
+  <footer>
+    <div class="footer-logo">H·E·R Luxury</div>
+    <div class="footer-copy">© 2024 H.E.R Luxury. All rights reserved.</div>
+  </footer>
+
+  <!-- ══ PURCHASE MODAL ════════════════════════════════════ -->
+  <div class="modal-overlay" id="buyModal">
+    <div class="modal">
+
+      <!-- Left: image -->
+      <div class="modal-image-panel" id="modalImagePanel">
+        <img id="modalImage" src="" alt="" style="display:none;" />
+        <div class="modal-bottle-placeholder" id="modalPlaceholder">
+          <svg width="70" viewBox="0 0 70 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="25" y="0" width="20" height="12" rx="2" fill="rgba(184,149,74,0.35)"/>
+            <rect x="28" y="12" width="14" height="18" rx="2" fill="rgba(184,149,74,0.25)"/>
+            <rect x="10" y="30" width="50" height="100" rx="8" fill="rgba(201,123,110,0.18)" stroke="rgba(184,149,74,0.3)" stroke-width="1"/>
+            <ellipse cx="22" cy="50" rx="6" ry="10" fill="rgba(255,255,255,0.35)" transform="rotate(-15 22 50)"/>
+            <text x="35" y="100" text-anchor="middle" font-family="Cinzel,serif" font-size="7" fill="rgba(184,149,74,0.5)" letter-spacing="2">H·E·R</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Right: content -->
+      <div class="modal-content-panel">
+        <button class="modal-close" onclick="closeBuyModal()">✕</button>
+        <div class="modal-collection" id="modalCollection"></div>
+        <h2 class="modal-name" id="modalName"></h2>
+        <p class="modal-notes" id="modalNotes"></p>
+        <div class="modal-divider"></div>
+        <p class="modal-desc" id="modalDesc"></p>
+        <div class="modal-price" id="modalPrice"></div>
+
+        <div id="modalRevolutSection" style="display:none;">
+          <div class="modal-payment-label">Secure Payment</div>
+          <a id="modalRevolutLink" href="#" target="_blank" class="modal-revolut-btn">
+            Purchase via Revolut →
+          </a>
+        </div>
+        <div id="modalNoRevolut" style="display:none;">
+          <p class="modal-no-revolut">Contact us to arrange payment for this fragrance.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ SCRIPTS ════════════════════════════════════════════ -->
+  <script src="config.js"></script>
+  <script src="store.js"></script>
+  <script>
+    // ── NAV scroll shadow ────────────────────────────────
+    window.addEventListener('scroll', () => {
+      document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // ── Product images (Unsplash, matched per scent) ────
+    const PRODUCT_IMAGES = {
+      default: [
+        'https://images.unsplash.com/photo-1541343672885-9be56236302a?w=600&q=80&fit=crop',
+        'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&q=80&fit=crop',
+        'https://images.unsplash.com/photo-1550782674-4a2a8c4f9001?w=600&q=80&fit=crop',
+        'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=600&q=80&fit=crop',
+        'https://images.unsplash.com/photo-1617897903246-719242758050?w=600&q=80&fit=crop',
+        'https://images.unsplash.com/photo-1590156546064-79d7f476e6c0?w=600&q=80&fit=crop',
+      ]
+    };
+
+    // Helper: assign stable image to product by index
+    function getProductImage(p, idx) {
+      if (p.image_url) return p.image_url;
+      return PRODUCT_IMAGES.default[idx % PRODUCT_IMAGES.default.length];
+    }
+
+    // ── State ────────────────────────────────────────────
+    let _allProducts = [];
+    let _currentFilter = 'all';
+
+    // ── Render grid ──────────────────────────────────────
+    const cardObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.08 });
+
+    function renderGrid(products) {
+      const grid = document.getElementById('productGrid');
+      const loading = document.getElementById('loadingState');
+
+      if (!products || !products.length) {
+        loading.textContent = 'Collection coming soon.';
+        return;
+      }
+
+      grid.innerHTML = products.map((p, i) => {
+        const imgSrc = getProductImage(p, i);
+        const inStock = p.in_stock !== false;
+        return `
+          <div class="perfume-card" onclick="openBuyModal('${p.id}', '${imgSrc}')">
+            <div class="card-image">
+              <img src="${imgSrc}" alt="${p.name}" loading="lazy" />
+              ${p.featured ? '<span class="card-badge featured-badge">Featured</span>' : ''}
+              ${!inStock ? '<span class="card-badge sold-out">Sold Out</span>' : ''}
+              <button class="card-quick-view" onclick="event.stopPropagation();openBuyModal('${p.id}','${imgSrc}')">
+                Quick View
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="card-collection">${p.collection || ''}</div>
+              <h3 class="card-name">${p.name}</h3>
+              <p class="card-notes">${p.notes || ''}</p>
+              <div class="card-footer">
+                <span class="card-price">€${p.price}</span>
+                ${inStock
+                  ? `<button class="card-buy" onclick="event.stopPropagation();openBuyModal('${p.id}','${imgSrc}')">Purchase</button>`
+                  : `<span class="card-buy disabled">Sold Out</span>`
+                }
+              </div>
+            </div>
+          </div>`;
+      }).join('');
+
+      loading.style.display = 'none';
+      grid.style.display = 'grid';
+
+      // Animate cards in
+      grid.querySelectorAll('.perfume-card').forEach((card, i) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(28px)';
+        card.style.transition = `opacity 0.55s ${i * 0.07}s ease, transform 0.55s ${i * 0.07}s ease`;
+        cardObserver.observe(card);
+      });
+    }
+
+    function filterCollection(collection, btn) {
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      _currentFilter = collection;
+      const filtered = collection === 'all' ? _allProducts : _allProducts.filter(p => p.collection === collection);
+      renderGrid(filtered);
+    }
+
+    // ── Featured scent setup ─────────────────────────────
+    function setupFeatured(products) {
+      const featured = products.find(p => p.featured) || products[0];
+      if (!featured) return;
+      window._featuredId = featured.id;
+
+      document.getElementById('featuredName').textContent = featured.name;
+      document.getElementById('featuredCollectionLabel').textContent = `${featured.collection} · Signature`;
+      document.getElementById('featuredDesc').textContent = featured.description || '';
+      document.getElementById('featuredPrice').textContent = `€${featured.price}`;
+      document.getElementById('featuredStock').textContent = featured.in_stock !== false ? 'In Stock' : 'Sold Out';
+
+      const noteStr = (featured.notes || '').split(',').map(n => n.trim());
+      document.getElementById('featuredNotes').innerHTML =
+        noteStr.map(n => `<span class="featured-note-pill">${n}</span>`).join('');
+
+      // featured image
+      const featImg = document.querySelector('.featured-image');
+      if (featured.image_url) featImg.src = featured.image_url;
+    }
+
+    // ── Stats ────────────────────────────────────────────
+    function updateStats(products) {
+      const inStock = products.filter(p => p.in_stock !== false).length;
+      const cols = [...new Set(products.map(p => p.collection))].length;
+      document.getElementById('statProducts').textContent = products.length;
+      document.getElementById('statCollections').textContent = cols;
+      document.getElementById('heroStatProducts').textContent = products.length;
+      document.getElementById('collectionCount').textContent = `${inStock} in stock · ${products.length} total`;
+    }
+
+    // ── Init ─────────────────────────────────────────────
+    async function init() {
+      try {
+        _allProducts = await getProducts();
+        renderGrid(_allProducts);
+        setupFeatured(_allProducts);
+        updateStats(_allProducts);
+
+        // Build filter tabs dynamically
+        const collections = [...new Set(_allProducts.map(p => p.collection))].filter(Boolean);
+        const filtersEl = document.getElementById('collectionFilters');
+        filtersEl.innerHTML = `<a class="filter-tab" href="collection.html" style="text-decoration:none;display:inline-block;">All →</a>` +
+          collections.map(c => `<button class="filter-tab" onclick="filterCollection('${c}',this)">${c}</button>`).join('');
+
+      } catch (err) {
+        document.getElementById('loadingState').textContent = 'Unable to load collection right now.';
+        console.error(err);
+      }
+    }
+
+    // ── Buy modal ────────────────────────────────────────
+    function openBuyModal(id, imgSrc) {
+      const p = _allProducts.find(x => x.id === id);
+      if (!p) return;
+
+      document.getElementById('modalCollection').textContent = p.collection || '';
+      document.getElementById('modalName').textContent = p.name;
+      document.getElementById('modalNotes').textContent = p.notes || '';
+      document.getElementById('modalDesc').textContent = p.description || '';
+      document.getElementById('modalPrice').textContent = `€${p.price}`;
+
+      // image
+      const modalImg = document.getElementById('modalImage');
+      const placeholder = document.getElementById('modalPlaceholder');
+      const src = p.image_url || imgSrc;
+      if (src) {
+        modalImg.src = src;
+        modalImg.style.display = 'block';
+        placeholder.style.display = 'none';
+      } else {
+        modalImg.style.display = 'none';
+        placeholder.style.display = 'flex';
+      }
+
+      // revolut
+      if (p.revolut) {
+        document.getElementById('modalRevolutSection').style.display = 'block';
+        document.getElementById('modalNoRevolut').style.display = 'none';
+        document.getElementById('modalRevolutLink').href = p.revolut.startsWith('http') ? p.revolut : 'https://' + p.revolut;
+      } else {
+        document.getElementById('modalRevolutSection').style.display = 'none';
+        document.getElementById('modalNoRevolut').style.display = 'block';
+      }
+
+      document.getElementById('buyModal').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function openBuyModalById(id) {
+      const img = getProductImage(_allProducts.find(p => p.id === id) || {}, 0);
+      openBuyModal(id, img);
+    }
+
+    function closeBuyModal() {
+      document.getElementById('buyModal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('buyModal').addEventListener('click', function(e) {
+      if (e.target === this) closeBuyModal();
+    });
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBuyModal(); });
+
+    init();
+  </script>
+</body>
+</html>
