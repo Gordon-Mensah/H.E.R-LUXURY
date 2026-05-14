@@ -666,6 +666,7 @@
     function initAdmin() {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('adminLayout').style.display = 'grid';
+      document.getElementById('adminMobileTopbar').style.display = 'flex';
       renderDashboard();
     }
 
@@ -1077,13 +1078,7 @@
       document.body.style.overflow = '';
     }
 
-    // Update mobile page title when switching panels
-    const _origShowPanel = showPanel;
-    function showPanel(name) {
-      _origShowPanel(name);
-      // sync mobile page heading
-      const titles = { dashboard:'Dashboard', upload:'Add via Image', products:'Products', ai:'AI Manager', design:'Design Studio', settings:'Settings' };
-    }
+
 
 
   </script>
