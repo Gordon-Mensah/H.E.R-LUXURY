@@ -4,20 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>H.E.R LUXURY — Artisan Fragrances</title>
-  <!-- DESIGN STUDIO: apply saved theme before first paint -->
+  <!-- DESIGN STUDIO: load theme from cache first (instant), then sync from Supabase -->
+  <script src="config.js"></script>
   <script>
     (function(){
-      try {
-        var t = localStorage.getItem('her_design_theme');
-        if (!t) return;
-        var theme = JSON.parse(t);
+      // ── Step 1: Apply cache immediately (zero delay) ──────────
+      // This makes the theme appear before anything renders,
+      // even before the Supabase fetch returns.
+      function applyTheme(theme) {
         var root = document.documentElement;
-        Object.entries(theme).forEach(function(e) {
-          if (e[0].startsWith('--')) root.style.setProperty(e[0], e[1]);
-        });
-        // Load any non-default Google Fonts
         var defaults = ['Cormorant Garamond','Jost','Cinzel','Georgia'];
         var toLoad = [];
+        Object.entries(theme).forEach(function(pair) {
+          if (pair[0].startsWith('--')) root.style.setProperty(pair[0], pair[1]);
+        });
         ['--font-heading','--font-body'].forEach(function(k) {
           if (!theme[k]) return;
           var m = theme[k].match(/'([^']+)'/);
@@ -30,7 +30,29 @@
           document.head.appendChild(link);
         }
         window.__designTheme = theme;
+      }
+
+      // Apply cached theme instantly (no network needed)
+      try {
+        var cached = localStorage.getItem('her_design_cache');
+        if (cached) applyTheme(JSON.parse(cached));
       } catch(e) {}
+
+      // ── Step 2: Fetch latest theme from Supabase in background ─
+      // Updates the cache and re-applies if anything changed.
+      // Visitors always get the latest design you saved.
+      fetch(SUPABASE_URL + '/rest/v1/settings?key=eq.design_theme&select=value&limit=1', {
+        headers: { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY }
+      }).then(function(r) { return r.json(); }).then(function(rows) {
+        if (!rows || !rows.length) return;
+        var theme = JSON.parse(rows[0].value);
+        // Update cache so next load is instant
+        try { localStorage.setItem('her_design_cache', JSON.stringify(theme)); } catch(e) {}
+        // Re-apply (handles case where cache was stale or missing)
+        applyTheme(theme);
+        // Handle section visibility after DOM is ready
+        window.__designTheme = theme;
+      }).catch(function(){});
     })();
   </script>
   <link rel="stylesheet" href="style.css" />
@@ -651,8 +673,7 @@
   <!-- DESIGN STUDIO: hide sections based on saved theme -->
   <script>
     (function(){
-      try {
-        var t = window.__designTheme || JSON.parse(localStorage.getItem('her_design_theme') || '{}');
+      function applyVisibility(t) {
         var map = {
           '--show-marquee':      'section-marquee',
           '--show-materials':    'section-materials',
@@ -663,9 +684,22 @@
           if (t[pair[0]] === '0') {
             var el = document.getElementById(pair[1]);
             if (el) el.style.display = 'none';
+          } else {
+            var el = document.getElementById(pair[1]);
+            if (el) el.style.display = '';
           }
         });
-      } catch(e) {}
+      }
+      // Apply from whatever theme is already set (cache or Supabase)
+      if (window.__designTheme) applyVisibility(window.__designTheme);
+      // Also listen for the Supabase fetch completing after DOM load
+      document.addEventListener('DOMContentLoaded', function() {
+        if (window.__designTheme) applyVisibility(window.__designTheme);
+        // Re-check after a short delay for slow connections
+        setTimeout(function() {
+          if (window.__designTheme) applyVisibility(window.__designTheme);
+        }, 800);
+      });
     })();
   </script>
 </body>

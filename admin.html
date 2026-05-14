@@ -1432,12 +1432,25 @@
       { label: 'Taupe / Accents',    key: '--taupe' },
     ];
 
-    function initDesignPanel() {
-      currentTheme = loadDesignTheme();
+    async function initDesignPanel() {
+      // Show cached theme instantly while fetching from Supabase
+      currentTheme = getCachedTheme() || { ...DEFAULT_THEME };
       renderColorControls();
       renderPresetBtns();
       syncUIFromTheme();
-      // Preview loads index.html in iframe — it reads localStorage on load
+
+      // Fetch latest from Supabase in the background
+      try {
+        const dbTheme = await getThemeFromDB();
+        if (dbTheme) {
+          currentTheme = { ...DEFAULT_THEME, ...dbTheme };
+          setCachedTheme(currentTheme);
+          syncUIFromTheme();
+          applyThemeToPreview();
+        }
+      } catch(err) {
+        console.warn('Could not load theme from Supabase:', err.message);
+      }
     }
 
     function renderColorControls() {
@@ -1501,8 +1514,8 @@
     }
 
     function applyThemeToPreview() {
-      // Save to localStorage first — the iframe reads it on reload
-      saveDesignTheme(currentTheme);
+      // Update local cache so the preview iframe loads it instantly
+      setCachedTheme(currentTheme);
       // Try to inject CSS directly into the live iframe without reloading
       const iframe = document.getElementById('designPreview');
       if (!iframe) return;
@@ -1536,7 +1549,7 @@
     }
 
     function refreshPreview() {
-      saveDesignTheme(currentTheme);
+      setCachedTheme(currentTheme);
       const iframe = document.getElementById('designPreview');
       if (iframe) iframe.src = 'index.html?' + Date.now();
     }
@@ -1591,10 +1604,20 @@
       showToast('Applied ' + name + ' theme');
     }
 
-    function saveAndApply() {
-      saveDesignTheme(currentTheme);
-      refreshPreview();
-      showToast('Design saved! Your storefront is updated ✓');
+    async function saveAndApply() {
+      const btn = event.target;
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+      try {
+        await saveThemeToDB(currentTheme);    // → Supabase (all visitors see it)
+        setCachedTheme(currentTheme);          // → localStorage cache (instant load)
+        refreshPreview();
+        showToast('Design saved! All visitors will see the new design ✓');
+      } catch(err) {
+        showToast('Save failed: ' + err.message, true);
+      }
+      btn.disabled = false;
+      btn.textContent = '↑ Save & Apply to Storefront';
     }
 
     function undoDesign() {
@@ -1606,9 +1629,15 @@
       showToast('Undone');
     }
 
-    function resetDesign() {
+    async function resetDesign() {
       if (!confirm('Reset all design changes back to the default? This cannot be undone.')) return;
-      currentTheme = resetDesignTheme();
+      currentTheme = { ...DEFAULT_THEME };
+      try {
+        await saveThemeToDB(currentTheme);
+        clearThemeCache();
+      } catch(err) {
+        showToast('Reset saved locally only — Supabase error: ' + err.message, true);
+      }
       syncUIFromTheme();
       refreshPreview();
       showToast('Reset to default design');

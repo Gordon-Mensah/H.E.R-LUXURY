@@ -231,6 +231,43 @@ async function processAICommand(userMessage, apiKey) {
   return { success: false, message: 'Something went wrong.', action: 'error' };
 }
 
+// ── DESIGN THEME (Supabase) ───────────────────────────
+// Theme is stored in a `settings` table as a single row:
+// { key: 'design_theme', value: '<json string>' }
+// Public read (anon), protected write (auth token required).
+
+async function getThemeFromDB() {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/settings?key=eq.design_theme&select=value&limit=1`,
+      { headers: getSupabaseHeaders() }
+    );
+    if (!res.ok) return null;
+    const rows = await res.json();
+    if (!rows || !rows.length) return null;
+    return JSON.parse(rows[0].value);
+  } catch { return null; }
+}
+
+async function saveThemeToDB(theme) {
+  const s = getSession();
+  if (!s?.access_token) throw new Error('Not logged in');
+  const payload = { key: 'design_theme', value: JSON.stringify(theme) };
+  // Upsert — insert or replace the single row
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/settings`, {
+    method: 'POST',
+    headers: {
+      ...getSupabaseHeaders(s.access_token),
+      'Prefer': 'resolution=merge-duplicates,return=minimal'
+    },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Failed to save theme');
+  }
+}
+
 // ── VISION AI: Image → Product ────────────────────────
 
 async function analyzeImageForProduct(imageFile, userDescription, apiKey) {

@@ -1,10 +1,10 @@
 /* ═══════════════════════════════════════════════════════════════
    H.E.R LUXURY — DESIGN STUDIO
-   Saves CSS variable overrides to localStorage.
-   index.html reads them on every load and applies instantly.
+   Theme is saved to Supabase so it works across all browsers
+   and on Vercel. localStorage is used only as a fast local cache.
 ═══════════════════════════════════════════════════════════════ */
 
-const DESIGN_KEY = 'her_design_theme';
+const DESIGN_CACHE_KEY = 'her_design_cache';
 const DESIGN_HISTORY_KEY = 'her_design_history';
 
 /* ── DEFAULT THEME ──────────────────────────────────────────── */
@@ -35,6 +35,10 @@ const DEFAULT_THEME = {
   '--font-heading': "'Cormorant Garamond', serif",
   '--font-body':    "'Jost', sans-serif",
   '--card-radius':  '0px',
+  '--show-marquee':      '1',
+  '--show-materials':    '1',
+  '--show-testimonials': '1',
+  '--show-about':        '1',
 };
 
 /* ── PRESET THEMES ──────────────────────────────────────────── */
@@ -42,6 +46,7 @@ const PRESETS = {
   'Original': { ...DEFAULT_THEME },
 
   'Midnight': {
+    ...DEFAULT_THEME,
     '--ivory':        '#0d0b09',
     '--cream':        '#131009',
     '--parchment':    '#1a1510',
@@ -65,9 +70,6 @@ const PRESETS = {
     '--card':         '#160f0a',
     '--white':        '#160f0a',
     '--deep':         '#0a0806',
-    '--font-heading': "'Cormorant Garamond', serif",
-    '--font-body':    "'Jost', sans-serif",
-    '--card-radius':  '0px',
   },
 
   'Emerald': {
@@ -141,22 +143,16 @@ const PRESETS = {
   },
 };
 
-/* ── LOAD / SAVE ────────────────────────────────────────────── */
-function loadDesignTheme() {
-  try {
-    const saved = localStorage.getItem(DESIGN_KEY);
-    return saved ? { ...DEFAULT_THEME, ...JSON.parse(saved) } : { ...DEFAULT_THEME };
-  } catch { return { ...DEFAULT_THEME }; }
+/* ── LOCAL CACHE ────────────────────────────────────────────── */
+function getCachedTheme() {
+  try { const s = localStorage.getItem(DESIGN_CACHE_KEY); return s ? JSON.parse(s) : null; }
+  catch { return null; }
 }
-
-function saveDesignTheme(theme) {
-  localStorage.setItem(DESIGN_KEY, JSON.stringify(theme));
+function setCachedTheme(theme) {
+  try { localStorage.setItem(DESIGN_CACHE_KEY, JSON.stringify(theme)); } catch {}
 }
-
-function resetDesignTheme() {
-  localStorage.removeItem(DESIGN_KEY);
-  localStorage.removeItem(DESIGN_HISTORY_KEY);
-  return { ...DEFAULT_THEME };
+function clearThemeCache() {
+  try { localStorage.removeItem(DESIGN_CACHE_KEY); } catch {}
 }
 
 /* ── UNDO HISTORY ────────────────────────────────────────────── */
@@ -168,7 +164,6 @@ function pushHistory(theme) {
     localStorage.setItem(DESIGN_HISTORY_KEY, JSON.stringify(hist));
   } catch {}
 }
-
 function undoHistory() {
   try {
     const hist = JSON.parse(localStorage.getItem(DESIGN_HISTORY_KEY) || '[]');
@@ -182,47 +177,40 @@ function undoHistory() {
 /* ── CSS EXPORT ─────────────────────────────────────────────── */
 function exportThemeAsCSS(theme) {
   const diff = {};
-  Object.entries(theme).forEach(([k, v]) => {
-    if (v !== DEFAULT_THEME[k]) diff[k] = v;
-  });
+  Object.entries(theme).forEach(([k, v]) => { if (v !== DEFAULT_THEME[k]) diff[k] = v; });
   if (!Object.keys(diff).length) return '/* No changes from default theme */';
-  const lines = Object.entries(diff).map(([k, v]) => `  ${k}: ${v};`).join('\n');
-  return `:root {\n${lines}\n}`;
+  return `:root {\n${Object.entries(diff).map(([k,v]) => `  ${k}: ${v};`).join('\n')}\n}`;
 }
 
 /* ── AI DESIGN COMMAND ───────────────────────────────────────── */
 async function processDesignCommand(message, currentTheme, groqApiKey) {
-  const themeJSON = JSON.stringify(currentTheme, null, 2);
-
   const systemPrompt = `You are an AI website designer for a luxury perfume brand called H.E.R Luxury.
 You control the website's visual design by modifying CSS custom property values.
 
 CURRENT THEME:
-${themeJSON}
+${JSON.stringify(currentTheme, null, 2)}
 
 RULES:
 - Respond ONLY with valid JSON — no markdown, no explanation, no backticks.
-- Your JSON must have exactly two keys: "message" (string) and "changes" (object with CSS variable key-value pairs).
-- Only include variables you are changing in "changes". Leave unchanged ones out.
-- For color values use valid hex colors only (e.g. "#c97b6e").
-- For font values keep the full CSS font-family string (e.g. "'Playfair Display', serif").
-- If the user's request requires no changes, return an empty "changes" object {}.
+- Return exactly two keys: "message" (string) and "changes" (object with CSS variable key-value pairs).
+- Only include variables you are changing in "changes".
+- Colors must be valid hex values (e.g. "#c97b6e").
+- Fonts must be full CSS font-family strings (e.g. "'Playfair Display', serif").
+- If no changes are needed, return "changes": {}.
 
 AVAILABLE CSS VARIABLES:
 Colors: --ivory, --cream, --parchment, --blush, --blush-mid, --blush-deep, --rose, --rose-dark, --rose-light, --gold, --gold-light, --gold-pale, --taupe, --text, --text-mid, --text-dim, --text-muted, --border, --border-lt, --surface, --card, --white, --deep
-Fonts: --font-heading (serif heading font), --font-body (sans-serif body font)
-Layout: --card-radius (e.g. "8px" for rounded, "0px" for sharp corners)
+Fonts: --font-heading, --font-body
+Layout: --card-radius (e.g. "8px")
+Sections: --show-marquee, --show-materials, --show-testimonials, --show-about ("1"=visible, "0"=hidden)
 
 DESIGN RULES:
 - --rose is the PRIMARY accent (buttons, highlights, badges)
-- --gold is the SECONDARY accent (prices, featured items)
-- --text is the main body text — always keep high contrast with --ivory
-- --ivory is the main page background
-- When going dark, update ALL colors appropriately — not just --ivory
-- When changing a color palette, update all related shades together
+- --gold is SECONDARY (prices, featured items)
+- --text must always contrast strongly with --ivory
+- When going dark, update ALL related colors together
 
-Example response:
-{"message": "Changed accent to emerald green.", "changes": {"--rose": "#3a8c60", "--rose-dark": "#2a6b48", "--gold": "#7ab88c"}}`;
+Example: {"message": "Changed to emerald.", "changes": {"--rose": "#3a8c60", "--rose-dark": "#2a6b48"}}`;
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -242,18 +230,12 @@ Example response:
 
   const data = await response.json();
   const text = data.content?.[0]?.text || '{}';
-
   let parsed;
-  try {
-    parsed = JSON.parse(text.trim());
-  } catch {
+  try { parsed = JSON.parse(text.trim()); }
+  catch {
     const match = text.match(/\{[\s\S]*\}/);
     if (match) parsed = JSON.parse(match[0]);
     else throw new Error('AI returned invalid JSON');
   }
-
-  return {
-    message: parsed.message || 'Done.',
-    changes: parsed.changes || {}
-  };
+  return { message: parsed.message || 'Done.', changes: parsed.changes || {} };
 }
