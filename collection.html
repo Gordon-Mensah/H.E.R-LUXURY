@@ -350,12 +350,27 @@
   <!-- ══ NAV ══════════════════════════════════════════════ -->
   <nav id="mainNav">
     <a class="nav-logo" href="index.html">H<em>·</em>E<em>·</em>R LUXURY</a>
-    <ul class="nav-links">
+    <ul class="nav-links" id="navLinks">
       <li><a href="collection.html" style="color: var(--rose);">Collection</a></li>
       <li><a href="index.html#about">Maison</a></li>
       <li><a href="index.html#contact">Contact</a></li>
     </ul>
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileNav()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+
+  <!-- MOBILE NAV DRAWER -->
+  <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="toggleMobileNav()"></div>
+  <div class="mobile-nav-drawer" id="mobileNavDrawer">
+    <button class="mobile-nav-close" onclick="toggleMobileNav()">✕</button>
+    <div class="mobile-nav-logo">H<em>·</em>E<em>·</em>R LUXURY</div>
+    <ul class="mobile-nav-links">
+      <li><a href="collection.html" onclick="toggleMobileNav()">Collection</a></li>
+      <li><a href="index.html#about" onclick="toggleMobileNav()">Maison</a></li>
+      <li><a href="index.html#contact" onclick="toggleMobileNav()">Contact</a></li>
+    </ul>
+  </div>
 
   <!-- ══ HERO BANNER ══════════════════════════════════════ -->
   <section class="collection-hero">
@@ -531,6 +546,17 @@
     window.addEventListener('scroll', () => {
       document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 40);
     });
+
+    // ── Mobile nav ────────────────────────────────────────
+    function toggleMobileNav() {
+      const drawer = document.getElementById('mobileNavDrawer');
+      const overlay = document.getElementById('mobileNavOverlay');
+      const btn = document.getElementById('navHamburger');
+      const open = drawer.classList.toggle('open');
+      overlay.classList.toggle('open', open);
+      btn.classList.toggle('open', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    }
 
     // ── Read ?collection= from URL ────────────────────────
     function getUrlCollection() {
