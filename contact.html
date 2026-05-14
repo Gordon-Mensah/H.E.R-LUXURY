@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — H.E.R LUXURY</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ── CONTACT PAGE STYLES ─────────────────────────── */
+
+    .contact-page {
+      min-height: 100vh;
+      background: var(--ivory);
+    }
+
+    /* Hero banner */
+    .contact-hero {
+      background: var(--text);
+      padding: 9rem 8vw 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-hero::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -80px;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(184,149,74,0.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .contact-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: 10%;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,123,110,0.06) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .contact-hero-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .contact-hero .section-eyebrow { color: var(--rose); margin-bottom: 1.2rem; }
+    .contact-hero .section-title { color: var(--white); }
+
+    .contact-hero-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-style: italic;
+      color: rgba(255,255,255,0.45);
+      margin-top: 1rem;
+      max-width: 480px;
+    }
+
+    /* Main layout */
+    .contact-body {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 6rem 8vw 8rem;
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 6rem;
+      align-items: start;
+    }
+
+    /* LEFT: info panel */
+    .contact-info { padding-top: 0.5rem; }
+
+    .contact-info-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .contact-info-desc {
+      font-size: 0.85rem;
+      color: var(--text-mid);
+      line-height: 1.85;
+      margin-bottom: 2.5rem;
+    }
+
+    .contact-info-items {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 3rem;
+    }
+
+    .contact-info-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.2rem 0;
+      border-bottom: 1px solid var(--border-lt);
+    }
+
+    .contact-info-item:first-child { border-top: 1px solid var(--border-lt); }
+
+    .contact-info-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--blush);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 0.7rem;
+      color: var(--rose-dark);
+      letter-spacing: 0.05em;
+    }
+
+    .contact-info-label {
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .contact-info-value {
+      font-size: 0.85rem;
+      color: var(--text-mid);
+    }
+
+    .contact-info-value a {
+      color: var(--rose-dark);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .contact-info-value a:hover { color: var(--rose); }
+
+    /* Promise box */
+    .contact-promise {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+    }
+
+    .contact-promise-title {
+      font-size: 0.58rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--rose);
+      margin-bottom: 0.8rem;
+    }
+
+    .contact-promise-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--text-mid);
+      line-height: 1.7;
+    }
+
+    /* RIGHT: form */
+    .contact-form-wrap {
+      background: var(--white);
+      border: 1px solid var(--border);
+      padding: 3rem;
+    }
+
+    .contact-form-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    .contact-form-subtitle {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      margin-bottom: 2.5rem;
+    }
+
+    /* Form fields */
+    .cf-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .cf-group { margin-bottom: 1.2rem; }
+
+    .cf-label {
+      display: block;
+      font-size: 0.55rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 0.5rem;
+    }
+
+    .cf-label span {
+      color: var(--rose);
+      margin-left: 2px;
+    }
+
+    .cf-input,
+    .cf-select,
+    .cf-textarea {
+      width: 100%;
+      background: var(--ivory);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.8rem 1rem;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 300;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      appearance: none;
+    }
+
+    .cf-input:focus,
+    .cf-select:focus,
+    .cf-textarea:focus {
+      border-color: var(--blush-deep);
+      background: var(--white);
+    }
+
+    .cf-input::placeholder,
+    .cf-textarea::placeholder { color: var(--text-muted); }
+
+    .cf-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23b0a49a'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      padding-right: 2.5rem;
+      cursor: pointer;
+    }
+
+    .cf-select option { background: var(--white); }
+
+    .cf-textarea {
+      resize: vertical;
+      min-height: 120px;
+      line-height: 1.6;
+    }
+
+    /* Honeypot — hidden from humans, catches bots */
+    .cf-honey { display: none; }
+
+    /* Submit button */
+    .cf-submit {
+      width: 100%;
+      background: var(--text);
+      color: var(--white);
+      border: none;
+      padding: 1rem 2rem;
+      font-family: 'Jost', sans-serif;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.25s, transform 0.15s;
+      margin-top: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+    }
+
+    .cf-submit:hover { background: var(--rose-dark); }
+    .cf-submit:active { transform: scale(0.99); }
+    .cf-submit:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; transform: none; }
+
+    .cf-submit-spinner {
+      width: 14px; height: 14px;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+
+    /* Success state */
+    .cf-success {
+      display: none;
+      text-align: center;
+      padding: 3rem 2rem;
+    }
+
+    .cf-success-icon {
+      width: 56px; height: 56px;
+      background: var(--blush);
+      border: 1px solid var(--blush-deep);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 1.3rem;
+    }
+
+    .cf-success-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 400;
+      color: var(--text);
+      margin-bottom: 0.8rem;
+    }
+
+    .cf-success-text {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+      max-width: 320px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cf-success-back {
+      display: inline-block;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--rose-dark);
+      border: 1px solid var(--blush-deep);
+      padding: 0.6rem 1.5rem;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .cf-success-back:hover { background: var(--blush); }
+
+    /* Error message */
+    .cf-error {
+      display: none;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #b91c1c;
+      padding: 0.8rem 1rem;
+      font-size: 0.75rem;
+      margin-top: 1rem;
+      line-height: 1.5;
+    }
+
+    /* Formspree notice */
+    .cf-notice {
+      font-size: 0.62rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 1rem;
+      line-height: 1.6;
+    }
+
+    .cf-notice a { color: var(--rose); text-decoration: none; }
+    .cf-notice a:hover { text-decoration: underline; }
+
+    /* ── SETUP BANNER (shown until Formspree URL is added) ── */
+    .setup-banner {
+      background: #fefce8;
+      border: 1px solid #fde047;
+      border-left: 3px solid #eab308;
+      padding: 1rem 1.2rem;
+      margin-bottom: 2rem;
+      font-size: 0.78rem;
+      color: #713f12;
+      line-height: 1.6;
+    }
+
+    .setup-banner strong { font-weight: 500; }
+    .setup-banner code {
+      background: rgba(0,0,0,0.06);
+      padding: 1px 5px;
+      font-family: monospace;
+      font-size: 0.85em;
+    }
+
+    /* ── RESPONSIVE ──────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .contact-body {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        padding: 4rem 6vw 6rem;
+      }
+      .contact-form-wrap { padding: 2rem; }
+    }
+
+    @media (max-width: 600px) {
+      .contact-hero { padding: 7rem 5vw 3rem; }
+      .contact-body { padding: 3rem 5vw 5rem; gap: 2.5rem; }
+      .cf-row { grid-template-columns: 1fr; gap: 0; }
+      .contact-form-wrap { padding: 1.5rem; }
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="contact-page">
+
+  <!-- ══ NAV ══════════════════════════════════════════════ -->
+  <nav id="mainNav" class="scrolled">
+    <a class="nav-logo" href="index.html">H<em>·</em>E<em>·</em>R LUXURY</a>
+    <ul class="nav-links">
+      <li><a href="collection.html">Collection</a></li>
+      <li><a href="index.html#about">Maison</a></li>
+      <li><a href="contact.html" style="color: var(--rose);">Contact</a></li>
+    </ul>
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleMobileNav()" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- MOBILE NAV DRAWER -->
+  <div class="mobile-nav-overlay" id="mobileNavOverlay" onclick="toggleMobileNav()"></div>
+  <div class="mobile-nav-drawer" id="mobileNavDrawer">
+    <button class="mobile-nav-close" onclick="toggleMobileNav()">✕</button>
+    <div class="mobile-nav-logo">H<em>·</em>E<em>·</em>R LUXURY</div>
+    <ul class="mobile-nav-links">
+      <li><a href="collection.html" onclick="toggleMobileNav()">Collection</a></li>
+      <li><a href="index.html#about" onclick="toggleMobileNav()">Maison</a></li>
+      <li><a href="contact.html" onclick="toggleMobileNav()">Contact</a></li>
+    </ul>
+  </div>
+
+  <!-- ══ HERO ══════════════════════════════════════════════ -->
+  <section class="contact-hero">
+    <div class="contact-hero-inner">
+      <div class="section-eyebrow">H·E·R Luxury</div>
+      <h1 class="section-title">Get in <em style="font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--gold-light);">touch</em></h1>
+      <p class="contact-hero-sub">Every great fragrance begins with a conversation.</p>
+    </div>
+  </section>
+
+  <!-- ══ MARQUEE ════════════════════════════════════════════ -->
+  <div class="marquee-strip" aria-hidden="true">
+    <div class="marquee-inner">
+      <span class="marquee-item">Bespoke Orders</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Wholesale Enquiries</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Gift Consultations</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Press &amp; Media</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">H·E·R Luxury</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Artisan Perfumery</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Bespoke Orders</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Wholesale Enquiries</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Gift Consultations</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Press &amp; Media</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">H·E·R Luxury</span><span class="marquee-sep">◆</span>
+      <span class="marquee-item">Artisan Perfumery</span><span class="marquee-sep">◆</span>
+    </div>
+  </div>
+
+  <!-- ══ MAIN CONTENT ══════════════════════════════════════ -->
+  <div class="contact-body">
+
+    <!-- LEFT: info -->
+    <div class="contact-info">
+      <h2 class="contact-info-title">We'd love to<br>hear from you</h2>
+      <p class="contact-info-desc">
+        Whether you're looking for a bespoke fragrance, a wholesale partnership, a gift for someone special, or simply want to talk about scent — we're here.
+      </p>
+
+      <div class="contact-info-items">
+        <div class="contact-info-item">
+          <div class="contact-info-icon">✉</div>
+          <div>
+            <div class="contact-info-label">Email</div>
+            <div class="contact-info-value">
+              <a href="mailto:hello@herluxury.com">hello@herluxury.com</a>
+            </div>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-info-icon">⏱</div>
+          <div>
+            <div class="contact-info-label">Response time</div>
+            <div class="contact-info-value">Within 24 hours</div>
+          </div>
+        </div>
+        <div class="contact-info-item">
+          <div class="contact-info-icon">◈</div>
+          <div>
+            <div class="contact-info-label">Enquiry types</div>
+            <div class="contact-info-value">Orders · Wholesale · Press · Gifting</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-promise">
+        <div class="contact-promise-title">Our promise</div>
+        <p class="contact-promise-text">
+          "Every enquiry is read personally. We don't do automated replies — you'll always hear from a real person."
+        </p>
+      </div>
+    </div>
+
+    <!-- RIGHT: form -->
+    <div class="contact-form-wrap">
+
+      <!-- This banner disappears once you add your Formspree URL below -->
+      <div class="setup-banner" id="setupBanner">
+        <strong>⚡ One step to activate:</strong> Replace <code>YOUR_FORMSPREE_ID</code> in this file with your real Formspree endpoint. See instructions at the bottom of this page.
+      </div>
+
+      <h2 class="contact-form-title">Send an enquiry</h2>
+      <p class="contact-form-subtitle">All fields marked with * are required.</p>
+
+      <!-- THE FORM — replace YOUR_FORMSPREE_ID with your actual ID -->
+      <form id="contactForm" action="https://formspree.io/f/xbdwvkbz" method="POST" novalidate>
+
+        <!-- Honeypot anti-spam field — leave this exactly as is -->
+        <input type="text" name="_gotcha" class="cf-honey" tabindex="-1" autocomplete="off" />
+
+        <!-- Tell Formspree where to redirect after submission -->
+        <input type="hidden" name="_next" value="contact.html?sent=true" />
+
+        <!-- Custom subject line in your inbox -->
+        <input type="hidden" name="_subject" value="New enquiry from H.E.R LUXURY website" />
+
+        <div class="cf-row">
+          <div class="cf-group">
+            <label class="cf-label" for="firstName">First name <span>*</span></label>
+            <input type="text" id="firstName" name="first_name" class="cf-input" placeholder="Amara" required autocomplete="given-name" />
+          </div>
+          <div class="cf-group">
+            <label class="cf-label" for="lastName">Last name <span>*</span></label>
+            <input type="text" id="lastName" name="last_name" class="cf-input" placeholder="Johnson" required autocomplete="family-name" />
+          </div>
+        </div>
+
+        <div class="cf-group">
+          <label class="cf-label" for="email">Email address <span>*</span></label>
+          <input type="email" id="email" name="email" class="cf-input" placeholder="you@example.com" required autocomplete="email" />
+        </div>
+
+        <div class="cf-group">
+          <label class="cf-label" for="enquiryType">Enquiry type <span>*</span></label>
+          <select id="enquiryType" name="enquiry_type" class="cf-select" required>
+            <option value="" disabled selected>Select a reason</option>
+            <option value="Product order">Product order</option>
+            <option value="Bespoke / custom fragrance">Bespoke / custom fragrance</option>
+            <option value="Wholesale enquiry">Wholesale enquiry</option>
+            <option value="Gift consultation">Gift consultation</option>
+            <option value="Press & media">Press &amp; media</option>
+            <option value="General question">General question</option>
+          </select>
+        </div>
+
+        <div class="cf-group">
+          <label class="cf-label" for="fragrance">Fragrance of interest</label>
+          <input type="text" id="fragrance" name="fragrance_interest" class="cf-input" placeholder="e.g. Velvet Noir, or not sure yet" />
+        </div>
+
+        <div class="cf-group">
+          <label class="cf-label" for="message">Your message <span>*</span></label>
+          <textarea id="message" name="message" class="cf-textarea" placeholder="Tell us what you're looking for..." required></textarea>
+        </div>
+
+        <div class="cf-error" id="cfError">
+          Please fill in all required fields and enter a valid email address.
+        </div>
+
+        <button type="submit" class="cf-submit" id="cfSubmit">
+          <span class="cf-submit-spinner" id="cfSpinner"></span>
+          <span id="cfBtnText">Send enquiry</span>
+        </button>
+
+        <p class="cf-notice">
+          Your details are used only to respond to your enquiry.<br>
+          Powered by <a href="https://formspree.io" target="_blank" rel="noopener">Formspree</a> — secure &amp; private.
+        </p>
+
+      </form>
+
+      <!-- Success message (shown after ?sent=true redirect) -->
+      <div class="cf-success" id="cfSuccess">
+        <div class="cf-success-icon">✓</div>
+        <h3 class="cf-success-title">Message received</h3>
+        <p class="cf-success-text">
+          Thank you for reaching out. We read every enquiry personally and will be in touch within 24 hours.
+        </p>
+        <a href="index.html" class="cf-success-back">Back to store</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ═════════════════════════════════════════════ -->
+  <footer>
+    <div class="footer-logo">H·E·R Luxury</div>
+    <div class="footer-copy">© 2024 H.E.R Luxury. All rights reserved.</div>
+  </footer>
+
+  <script src="store.js"></script>
+  <script>
+    // ── NAV scroll shadow ─────────────────────────────────
+    window.addEventListener('scroll', () => {
+      document.getElementById('mainNav').classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // ── Mobile nav ────────────────────────────────────────
+    function toggleMobileNav() {
+      const drawer = document.getElementById('mobileNavDrawer');
+      const overlay = document.getElementById('mobileNavOverlay');
+      const btn = document.getElementById('navHamburger');
+      const open = drawer.classList.toggle('open');
+      overlay.classList.toggle('open', open);
+      btn.classList.toggle('open', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    }
+
+    // ── Show success if redirected back after submit ───────
+    if (window.location.search.includes('sent=true')) {
+      document.getElementById('contactForm').style.display = 'none';
+      document.getElementById('cfSuccess').style.display = 'block';
+      document.getElementById('setupBanner').style.display = 'none';
+      // Clean up the URL
+      window.history.replaceState({}, '', 'contact.html');
+    }
+
+    // ── Hide setup banner if Formspree ID is real ─────────
+    const formAction = document.getElementById('contactForm').action;
+    if (!formAction.includes('xbdwvkbz')) {
+      document.getElementById('setupBanner').style.display = 'none';
+    }
+
+    // ── Client-side validation + loading state ────────────
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName  = document.getElementById('lastName').value.trim();
+      const email     = document.getElementById('email').value.trim();
+      const type      = document.getElementById('enquiryType').value;
+      const message   = document.getElementById('message').value.trim();
+      const errorEl   = document.getElementById('cfError');
+
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+      if (!firstName || !lastName || !email || !emailValid || !type || !message) {
+        e.preventDefault();
+        errorEl.style.display = 'block';
+        errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      errorEl.style.display = 'none';
+
+      // Show loading state
+      const btn = document.getElementById('cfSubmit');
+      const spinner = document.getElementById('cfSpinner');
+      const btnText = document.getElementById('cfBtnText');
+      btn.disabled = true;
+      spinner.style.display = 'block';
+      btnText.textContent = 'Sending...';
+    });
+  </script>
+</body>
+</html>
