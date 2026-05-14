@@ -4,6 +4,35 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>H.E.R LUXURY — Artisan Fragrances</title>
+  <!-- DESIGN STUDIO: apply saved theme before first paint -->
+  <script>
+    (function(){
+      try {
+        var t = localStorage.getItem('her_design_theme');
+        if (!t) return;
+        var theme = JSON.parse(t);
+        var root = document.documentElement;
+        Object.entries(theme).forEach(function(e) {
+          if (e[0].startsWith('--')) root.style.setProperty(e[0], e[1]);
+        });
+        // Load any non-default Google Fonts
+        var defaults = ['Cormorant Garamond','Jost','Cinzel','Georgia'];
+        var toLoad = [];
+        ['--font-heading','--font-body'].forEach(function(k) {
+          if (!theme[k]) return;
+          var m = theme[k].match(/'([^']+)'/);
+          if (m && !defaults.includes(m[1])) toLoad.push(m[1].replace(/ /g,'+'));
+        });
+        if (toLoad.length) {
+          var link = document.createElement('link');
+          link.rel = 'stylesheet';
+          link.href = 'https://fonts.googleapis.com/css2?family=' + toLoad.join('&family=') + ':wght@200;300;400;500&display=swap';
+          document.head.appendChild(link);
+        }
+        window.__designTheme = theme;
+      } catch(e) {}
+    })();
+  </script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -83,7 +112,7 @@
   </section>
 
   <!-- ══ MARQUEE ════════════════════════════════════════════ -->
-  <div class="marquee-strip" aria-hidden="true">
+  <div class="marquee-strip" id="section-marquee" aria-hidden="true">
     <div class="marquee-inner">
       <span class="marquee-item">Artisan Perfumery</span><span class="marquee-sep">◆</span>
       <span class="marquee-item">Handcrafted Luxury</span><span class="marquee-sep">◆</span>
@@ -170,7 +199,7 @@
   </section>
 
   <!-- ══ MATERIALS STRIP ═══════════════════════════════════ -->
-  <section class="materials-section">
+  <section class="materials-section" id="section-materials">
     <div style="max-width:1300px;margin:0 auto;">
       <div class="section-eyebrow">The Ingredients</div>
       <h2 class="section-title">Sourced from <em>the world's finest</em></h2>
@@ -222,7 +251,8 @@
   </section>
 
   <!-- ══ ABOUT ══════════════════════════════════════════════ -->
-  <section class="about-section" id="about">
+  <section class="about-section" id="section-about">
+    <a id="about" style="position:absolute;top:-80px;"></a>
     <div class="about-inner">
 
       <!-- Image stack -->
@@ -286,7 +316,7 @@
   </section>
 
   <!-- ══ TESTIMONIALS ═══════════════════════════════════════ -->
-  <section class="testimonials-section">
+  <section class="testimonials-section" id="section-testimonials">
     <div style="max-width:1300px;margin:0 auto;">
       <div class="section-eyebrow">What She Says</div>
       <h2 class="section-title">Worn with <em>devotion</em></h2>
@@ -616,6 +646,27 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeBuyModal(); });
 
     init();
+  </script>
+
+  <!-- DESIGN STUDIO: hide sections based on saved theme -->
+  <script>
+    (function(){
+      try {
+        var t = window.__designTheme || JSON.parse(localStorage.getItem('her_design_theme') || '{}');
+        var map = {
+          '--show-marquee':      'section-marquee',
+          '--show-materials':    'section-materials',
+          '--show-testimonials': 'section-testimonials',
+          '--show-about':        'section-about',
+        };
+        Object.entries(map).forEach(function(pair) {
+          if (t[pair[0]] === '0') {
+            var el = document.getElementById(pair[1]);
+            if (el) el.style.display = 'none';
+          }
+        });
+      } catch(e) {}
+    })();
   </script>
 </body>
 </html>
