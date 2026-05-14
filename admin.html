@@ -206,50 +206,6 @@
 
     .confirm-btn:hover { background: var(--rose-dark); }
     .confirm-btn:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
-
-    /* ── MOBILE ADMIN TOPBAR ── */
-    .admin-mobile-topbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 300;
-      background: var(--white);
-      border-bottom: 1px solid var(--border-lt);
-      padding: 0.9rem 1.2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 2px 12px rgba(60,40,20,0.07);
-    }
-
-    /* ── MOBILE ADMIN DRAWER ── */
-    .mobile-admin-drawer {
-      position: fixed;
-      top: 0; left: 0;
-      width: min(80vw, 300px);
-      height: 100%;
-      background: var(--white);
-      z-index: 400;
-      padding: 1.5rem 1.5rem 2.5rem;
-      display: flex;
-      flex-direction: column;
-      transform: translateX(-100%);
-      transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
-      overflow-y: auto;
-      border-right: 1px solid var(--border-lt);
-    }
-
-    .mobile-admin-drawer.open {
-      transform: translateX(0);
-    }
-
-    @media (max-width: 768px) {
-      .admin-mobile-topbar { display: flex !important; }
-      .admin-layout { grid-template-columns: 1fr !important; }
-      .admin-sidebar { display: none !important; }
-      .admin-main { padding: 1.2rem 1rem 3rem; margin-top: 58px; }
-      .admin-topbar { display: none; }
-      .admin-mobile-topbar ~ .mobile-nav-overlay { z-index: 350; }
-    }
   </style>
 </head>
 <body class="admin-body">
@@ -275,42 +231,6 @@
   </div>
 
   <!-- ══ ADMIN DASHBOARD ════════════════════════════════ -->
-  <!-- MOBILE ADMIN TOPBAR -->
-  <div class="admin-mobile-topbar" id="adminMobileTopbar" style="display:none;">
-    <div style="display:flex;flex-direction:column;gap:2px;">
-      <div style="font-family:'Cinzel',serif;font-size:0.85rem;letter-spacing:0.25em;color:var(--text);text-transform:uppercase;">H.E.R Luxury</div>
-      <div style="font-size:0.5rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--text-muted);">Store Admin</div>
-    </div>
-    <button class="nav-hamburger" id="adminHamburger" onclick="toggleAdminDrawer()" aria-label="Open menu">
-      <span></span><span></span><span></span>
-    </button>
-  </div>
-
-  <!-- MOBILE SIDEBAR OVERLAY -->
-  <div class="mobile-nav-overlay" id="adminSidebarOverlay" onclick="closeAdminDrawer()"></div>
-
-  <!-- MOBILE SIDEBAR DRAWER -->
-  <div class="mobile-admin-drawer" id="adminSidebarDrawer">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border-lt);">
-      <div>
-        <div style="font-family:'Cinzel',serif;font-size:0.85rem;letter-spacing:0.25em;color:var(--text);text-transform:uppercase;">H.E.R Luxury</div>
-        <div style="font-size:0.52rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--text-muted);margin-top:0.2rem;">Store Admin</div>
-      </div>
-      <button class="mobile-nav-close" onclick="closeAdminDrawer()">&#x2715;</button>
-    </div>
-    <ul class="mobile-nav-links" style="margin-bottom:auto;">
-      <li><a href="#" onclick="showPanel('dashboard');closeAdminDrawer();return false;">&#x25C8; &nbsp;Dashboard</a></li>
-      <li><a href="#" onclick="showPanel('upload');closeAdminDrawer();return false;">&#x2295; &nbsp;Add via Image</a></li>
-      <li><a href="#" onclick="showPanel('products');closeAdminDrawer();return false;">&#x25C7; &nbsp;Products</a></li>
-      <li><a href="#" onclick="showPanel('ai');closeAdminDrawer();return false;">&#x2726; &nbsp;AI Manager</a></li>
-      <li><a href="#" onclick="showPanel('settings');closeAdminDrawer();return false;">&#x25CE; &nbsp;Settings</a></li>
-      <li><a href="index.html">&#x2190; &nbsp;View Storefront</a></li>
-    </ul>
-    <div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border-lt);">
-      <button onclick="doSignOut();closeAdminDrawer()" style="background:none;border:none;cursor:pointer;font-size:0.62rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-muted);font-family:'Jost',sans-serif;padding:0;transition:color 0.2s;" onmouseover="this.style.color='var(--rose)'" onmouseout="this.style.color='var(--text-muted)'">Sign Out &#x2197;</button>
-    </div>
-  </div>
-
   <div class="admin-layout" id="adminLayout" style="display:none;">
 
     <!-- SIDEBAR -->
@@ -377,13 +297,7 @@
       <!-- ══ PANEL: ADD VIA IMAGE ══════════════════════ -->
       <div id="panel-upload" style="display:none;">
 
-        <div id="uploadKeyWarning" class="admin-card" style="margin-bottom:2rem;display:none;">
-          <div class="admin-card-header"><span class="admin-card-title" style="color:var(--rose);">⚠ Groq API Key Required</span></div>
-          <div style="padding:1.5rem;">
-            <p style="font-size:0.82rem;color:var(--text-mid);margin-bottom:1rem;">The AI Image Analyzer needs a Groq API key. Get one free at <a href="https://console.groq.com" target="_blank" style="color:var(--rose);">console.groq.com</a>, then add it in Settings.</p>
-            <button class="btn btn-primary" onclick="showPanel('settings')">Go to Settings →</button>
-          </div>
-        </div>
+
 
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
 
@@ -504,13 +418,7 @@
 
       <!-- ══ PANEL: AI MANAGER ══════════════════════════ -->
       <div id="panel-ai" style="display:none;">
-        <div id="aiKeyWarning" class="admin-card" style="margin-bottom:2rem;display:none;">
-          <div class="admin-card-header"><span class="admin-card-title" style="color:var(--rose);">⚠ Groq API Key Required</span></div>
-          <div style="padding:1.5rem;">
-            <p style="font-size:0.82rem;color:var(--text-mid);margin-bottom:1rem;">Get a free key at <a href="https://console.groq.com" target="_blank" style="color:var(--rose);">console.groq.com</a>, then add it in Settings.</p>
-            <button class="btn btn-primary" onclick="showPanel('settings')">Go to Settings →</button>
-          </div>
-        </div>
+
 
         <div class="ai-console">
           <div class="ai-console-header">
@@ -666,7 +574,6 @@
     function initAdmin() {
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('adminLayout').style.display = 'grid';
-      document.getElementById('adminMobileTopbar').style.display = 'flex';
       renderDashboard();
     }
 
@@ -691,8 +598,7 @@
       document.getElementById('pageTitle').textContent = titles[name];
       if (name === 'dashboard') renderDashboard();
       if (name === 'products') renderProductsTable();
-      if (name === 'ai') checkApiKey('aiKeyWarning');
-      if (name === 'upload') checkApiKey('uploadKeyWarning');
+
       if (name === 'settings') loadSettings();
     }
 
@@ -804,7 +710,6 @@
 
     async function analyzeImage() {
       const settings = getSettings();
-      if (!settings.groqApiKey) { showToast('Add your Groq API key in Settings first', true); showPanel('settings'); return; }
       if (!selectedImageFile) { showToast('Please upload an image first', true); return; }
 
       const btn = document.getElementById('analyzeBtn');
@@ -814,7 +719,7 @@
 
       try {
         const desc = document.getElementById('imageDesc').value.trim();
-        const result = await analyzeImageForProduct(selectedImageFile, desc, settings.groqApiKey);
+        const result = await analyzeImageForProduct(selectedImageFile, desc);
 
         document.getElementById('aiName').value = result.name || '';
         document.getElementById('aiCollection').value = result.collection || 'Essence';
@@ -990,10 +895,7 @@
       showToast('Settings saved');
     }
 
-    function checkApiKey(warningId) {
-      const key = getSettings().groqApiKey;
-      document.getElementById(warningId).style.display = key ? 'none' : 'block';
-    }
+
 
     // ── AI MANAGER ───────────────────────────────────
 
@@ -1026,16 +928,13 @@
       const message = input.value.trim();
       if (!message) return;
 
-      const settings = getSettings();
-      if (!settings.groqApiKey) { showToast('Add your Groq API key in Settings first', true); showPanel('settings'); return; }
-
       input.value = '';
       sendBtn.disabled = true;
       addMessage(messagesId, 'user', message);
       addLoadingMessage(messagesId);
 
       try {
-        const result = await processAICommand(message, settings.groqApiKey);
+        const result = await processAICommand(message);
         removeLoadingMessage();
         addMessage(messagesId, 'ai', result.message, result.success ? 'success' : 'error');
         if (result.success && result.action !== 'info') {
@@ -1053,33 +952,6 @@
 
     function sendAICommand() { runAICommand('aiInput', 'aiMessages', 'aiSendBtn'); }
     function sendDashCommand() { runAICommand('dashAiInput', 'dashAiMessages', 'dashSendBtn'); }
-
-    // ── MOBILE ADMIN DRAWER ─────────────────────────
-
-    function toggleAdminDrawer() {
-      const drawer = document.getElementById('adminSidebarDrawer');
-      const overlay = document.getElementById('adminSidebarOverlay');
-      const hamburger = document.getElementById('adminHamburger');
-      const isOpen = drawer.classList.contains('open');
-      if (isOpen) {
-        closeAdminDrawer();
-      } else {
-        drawer.classList.add('open');
-        overlay.classList.add('open');
-        hamburger.classList.add('open');
-        document.body.style.overflow = 'hidden';
-      }
-    }
-
-    function closeAdminDrawer() {
-      document.getElementById('adminSidebarDrawer').classList.remove('open');
-      document.getElementById('adminSidebarOverlay').classList.remove('open');
-      document.getElementById('adminHamburger').classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-
-
 
   </script>
 </body>

@@ -162,7 +162,7 @@ function saveSettings(settings) {
 
 // ── AI COMMAND PARSER (Groq) ──────────────────────────
 
-async function executeAICommand(userMessage, apiKey, products) {
+async function executeAICommand(userMessage, products) {
   const systemPrompt = `You are the store manager AI for "H.E.R LUXURY", a luxury perfume store.
 Interpret natural language commands and return a JSON action object.
 
@@ -200,9 +200,9 @@ Rules: extract price numbers, "sold out" → in_stock:false, "back in stock" →
   return JSON.parse(raw.replace(/```json\n?|\n?```/g, '').trim());
 }
 
-async function processAICommand(userMessage, apiKey) {
+async function processAICommand(userMessage) {
   const products = await getProducts();
-  const result = await executeAICommand(userMessage, apiKey, products);
+  const result = await executeAICommand(userMessage, products);
 
   switch (result.action) {
     case 'add':
@@ -233,7 +233,7 @@ async function processAICommand(userMessage, apiKey) {
 
 // ── VISION AI: Image → Product ────────────────────────
 
-async function analyzeImageForProduct(imageFile, userDescription, apiKey) {
+async function analyzeImageForProduct(imageFile, userDescription) {
   const base64 = await fileToBase64(imageFile);
 
   const prompt = `You are a luxury perfume product creator for H.E.R LUXURY.

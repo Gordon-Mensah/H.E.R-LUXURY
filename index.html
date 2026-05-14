@@ -81,7 +81,6 @@
       <li><a href="collection.html" onclick="toggleMobileNav()">Collection</a></li>
       <li><a href="#about" onclick="toggleMobileNav()">Maison</a></li>
       <li><a href="#contact" onclick="toggleMobileNav()">Contact</a></li>
-      <li><a href="admin.html">Admin</a></li>
     </ul>
   </div>
 
@@ -207,7 +206,7 @@
 
     <!-- Collection filter tabs -->
     <div class="collection-filters" id="collectionFilters">
-      <button class="filter-tab active" onclick="filterCollection('all', this)">All</button>
+      <button class="filter-tab active" onclick="window.location.href='collection.html'">All</button>
       <button class="filter-tab" onclick="filterCollection('Nocturne', this)">Nocturne</button>
       <button class="filter-tab" onclick="filterCollection('Lumière', this)">Lumière</button>
       <button class="filter-tab" onclick="filterCollection('Essence', this)">Essence</button>
@@ -604,7 +603,7 @@
         // Build filter tabs dynamically
         const collections = [...new Set(_allProducts.map(p => p.collection))].filter(Boolean);
         const filtersEl = document.getElementById('collectionFilters');
-        filtersEl.innerHTML = `<a class="filter-tab" href="collection.html" style="text-decoration:none;display:inline-block;">All →</a>` +
+        filtersEl.innerHTML = `<button class="filter-tab active" onclick="window.location.href='collection.html'">All</button>` +
           collections.map(c => `<button class="filter-tab" onclick="filterCollection('${c}',this)">${c}</button>`).join('');
 
       } catch (err) {
