@@ -305,7 +305,7 @@
           </div>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
+        <div class="upload-panel-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
 
           <!-- LEFT: Upload + Description -->
           <div>
@@ -458,7 +458,7 @@
 
         <div style="margin-top:2rem;padding:1.5rem;background:var(--white);border:1px solid var(--border);">
           <div style="font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--text-muted);margin-bottom:1rem;">Example Commands</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
+          <div class="ai-examples-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
             <div style="font-size:0.72rem;color:var(--text-dim);padding:0.5rem;border-left:2px solid var(--blush-mid);">Change [name] price to €[amount]</div>
             <div style="font-size:0.72rem;color:var(--text-dim);padding:0.5rem;border-left:2px solid var(--blush-mid);">Mark [name] as sold out / back in stock</div>
             <div style="font-size:0.72rem;color:var(--text-dim);padding:0.5rem;border-left:2px solid var(--blush-mid);">Add revolut.me/[handle] to [name]</div>
@@ -500,6 +500,32 @@
 
     </main>
   </div>
+
+  <!-- ══ MOBILE BOTTOM NAV ══════════════════════════════ -->
+  <nav class="admin-mobile-nav" id="adminMobileNav">
+    <div class="admin-mobile-nav-inner">
+      <button class="admin-mobile-nav-btn active" id="mnav-dashboard" onclick="showPanel('dashboard'); setMobileNav('dashboard')">
+        <span class="admin-mobile-nav-icon">◈</span>
+        <span>Dashboard</span>
+      </button>
+      <button class="admin-mobile-nav-btn" id="mnav-upload" onclick="showPanel('upload'); setMobileNav('upload')">
+        <span class="admin-mobile-nav-icon">⊕</span>
+        <span>Add Image</span>
+      </button>
+      <button class="admin-mobile-nav-btn" id="mnav-products" onclick="showPanel('products'); setMobileNav('products')">
+        <span class="admin-mobile-nav-icon">◇</span>
+        <span>Products</span>
+      </button>
+      <button class="admin-mobile-nav-btn" id="mnav-ai" onclick="showPanel('ai'); setMobileNav('ai')">
+        <span class="admin-mobile-nav-icon">✦</span>
+        <span>AI</span>
+      </button>
+      <button class="admin-mobile-nav-btn" id="mnav-settings" onclick="showPanel('settings'); setMobileNav('settings')">
+        <span class="admin-mobile-nav-icon">◎</span>
+        <span>Settings</span>
+      </button>
+    </div>
+  </nav>
 
   <!-- PRODUCT MODAL (manual add/edit) -->
   <div class="modal-overlay" id="productModal">
@@ -601,12 +627,20 @@
     const panels = ['dashboard', 'upload', 'products', 'ai', 'settings'];
     const titles = { dashboard: 'Dashboard', upload: 'Add via Image', products: 'Products', ai: 'AI Manager', settings: 'Settings' };
 
+    function setMobileNav(name) {
+      panels.forEach(p => {
+        const btn = document.getElementById(`mnav-${p}`);
+        if (btn) btn.classList.toggle('active', p === name);
+      });
+    }
+
     function showPanel(name) {
       panels.forEach(p => {
         document.getElementById(`panel-${p}`).style.display = p === name ? 'block' : 'none';
         const nav = document.getElementById(`nav-${p}`);
         if (nav) nav.classList.toggle('active', p === name);
       });
+      setMobileNav(name);
       document.getElementById('pageTitle').textContent = titles[name];
       if (name === 'dashboard') renderDashboard();
       if (name === 'products') renderProductsTable();
@@ -974,5 +1008,14 @@
     function sendDashCommand() { runAICommand('dashAiInput', 'dashAiMessages', 'dashSendBtn'); }
 
   </script>
+  <script>
+  /* Wrap all products-table elements so they scroll internally */
+  document.querySelectorAll('.products-table').forEach(function(t) {
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;';
+    t.parentNode.insertBefore(wrap, t);
+    wrap.appendChild(t);
+  });
+</script>
 </body>
 </html>
