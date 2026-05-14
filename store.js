@@ -179,9 +179,9 @@ Respond with ONLY valid JSON, no markdown. Structure:
 
 Rules: extract price numbers, "sold out" → in_stock:false, "back in stock" → in_stock:true, match names case-insensitively. Collections: Nocturne, Lumière, Essence.`;
 
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  const response = await fetch('/api/groq', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'llama-3.3-70b-versatile',
       messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userMessage }],
@@ -231,43 +231,6 @@ async function processAICommand(userMessage, apiKey) {
   return { success: false, message: 'Something went wrong.', action: 'error' };
 }
 
-// ── DESIGN THEME (Supabase) ───────────────────────────
-// Theme is stored in a `settings` table as a single row:
-// { key: 'design_theme', value: '<json string>' }
-// Public read (anon), protected write (auth token required).
-
-async function getThemeFromDB() {
-  try {
-    const res = await fetch(
-      `${SUPABASE_URL}/rest/v1/settings?key=eq.design_theme&select=value&limit=1`,
-      { headers: getSupabaseHeaders() }
-    );
-    if (!res.ok) return null;
-    const rows = await res.json();
-    if (!rows || !rows.length) return null;
-    return JSON.parse(rows[0].value);
-  } catch { return null; }
-}
-
-async function saveThemeToDB(theme) {
-  const s = getSession();
-  if (!s?.access_token) throw new Error('Not logged in');
-  const payload = { key: 'design_theme', value: JSON.stringify(theme) };
-  // Upsert — insert or replace the single row
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/settings`, {
-    method: 'POST',
-    headers: {
-      ...getSupabaseHeaders(s.access_token),
-      'Prefer': 'resolution=merge-duplicates,return=minimal'
-    },
-    body: JSON.stringify(payload)
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || 'Failed to save theme');
-  }
-}
-
 // ── VISION AI: Image → Product ────────────────────────
 
 async function analyzeImageForProduct(imageFile, userDescription, apiKey) {
@@ -290,9 +253,9 @@ Return ONLY valid JSON:
 
 Price 45-95 based on bottle luxury. Dark/heavy bottles → Nocturne (oud, amber, patchouli). Light/floral → Lumière or Essence. Be poetic and luxury-brand in tone.`;
 
-  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  const response = await fetch('/api/groq', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'meta-llama/llama-4-scout-17b-16e-instruct',
       messages: [{
