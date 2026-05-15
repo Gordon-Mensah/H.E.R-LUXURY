@@ -288,3 +288,250 @@ function fileToBase64(file) {
     reader.readAsDataURL(file);
   });
 }
+
+// ═══════════════════════════════════════════════════════
+//  ENQUIRY SYSTEM — Supabase data layer
+// ═══════════════════════════════════════════════════════
+
+async function sb(path, opts = {}) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+    headers: {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+      ...opts.headers
+    },
+    ...opts
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || err.error || `Supabase error ${res.status}`);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+// ── Enquiries ──────────────────────────────────────────
+
+async function submitEnquiry(data) {
+  return sb('enquiries', {
+    method: 'POST',
+    body: JSON.stringify(data),
+    prefer: 'return=representation'
+  });
+}
+
+async function getEnquiries({ status, type, limit = 200 } = {}) {
+  let q = `enquiries?order=created_at.desc&limit=${limit}`;
+  if (status && status !== 'all') q += `&status=eq.${status}`;
+  if (type && type !== 'all') q += `&enquiry_type=eq.${encodeURIComponent(type)}`;
+  return sb(q, { method: 'GET', prefer: 'return=representation' });
+}
+
+async function updateEnquiry(id, data) {
+  return sb(`enquiries?id=eq.${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+    prefer: 'return=representation'
+  });
+}
+
+async function deleteEnquiry(id) {
+  return sb(`enquiries?id=eq.${id}`, {
+    method: 'DELETE',
+    prefer: 'return=representation'
+  });
+}
+
+async function deleteEnquiries(ids) {
+  return sb(`enquiries?id=in.(${ids.join(',')})`, {
+    method: 'DELETE',
+    prefer: 'return=representation'
+  });
+}
+
+async function getEnquiryStats() {
+  const all = await getEnquiries();
+  if (!all) return { total: 0, unread: 0, replied: 0, archived: 0 };
+  return {
+    total: all.length,
+    unread: all.filter(e => e.status === 'unread').length,
+    replied: all.filter(e => e.status === 'replied').length,
+    archived: all.filter(e => e.status === 'archived').length,
+  };
+}
+
+// ── Form Config ────────────────────────────────────────
+
+const DEFAULT_FORM_CONFIG = {
+  heading: 'Send an enquiry',
+  subheading: 'All fields marked with * are required.',
+  fields: [
+    { id: 'first_name', label: 'First name', type: 'text', placeholder: 'Amara', required: true, width: 'half' },
+    { id: 'last_name', label: 'Last name', type: 'text', placeholder: 'Johnson', required: true, width: 'half' },
+    { id: 'email', label: 'Email address', type: 'email', placeholder: 'you@example.com', required: true, width: 'full' },
+    { id: 'enquiry_type', label: 'Enquiry type', type: 'select', required: true, width: 'full',
+      options: ['Product order', 'Bespoke / custom fragrance', 'Wholesale enquiry', 'Gift consultation', 'Press & media', 'General question'] },
+    { id: 'fragrance_interest', label: 'Fragrance of interest', type: 'text', placeholder: 'e.g. Velvet Noir, or not sure yet', required: false, width: 'full' },
+    { id: 'message', label: 'Your message', type: 'textarea', placeholder: 'Tell us what you\'re looking for...', required: true, width: 'full' }
+  ],
+  submitLabel: 'Send enquiry',
+  successTitle: 'Message received',
+  successText: 'Thank you for reaching out. We read every enquiry personally and will be in touch within 24 hours.'
+};
+
+async function getFormConfig() {
+  try {
+    const rows = await sb('form_config?id=eq.contact_form', { method: 'GET', prefer: 'return=representation' });
+    if (rows && rows.length > 0) return rows[0].config;
+  } catch(e) {}
+  return DEFAULT_FORM_CONFIG;
+}
+
+async function saveFormConfig(config) {
+  const existing = await sb('form_config?id=eq.contact_form', { method: 'GET', prefer: 'return=representation' }).catch(() => []);
+  if (existing && existing.length > 0) {
+    return sb('form_config?id=eq.contact_form', {
+      method: 'PATCH',
+      body: JSON.stringify({ config, updated_at: new Date().toISOString() }),
+      prefer: 'return=representation'
+    });
+  } else {
+    return sb('form_config', {
+      method: 'POST',
+      body: JSON.stringify({ id: 'contact_form', config, updated_at: new Date().toISOString() }),
+      prefer: 'return=representation'
+    });
+  }
+}
+
+// ── AI Form Designer ───────────────────────────────────
+
+async function processFormDesignCommand(userMessage) {
+  const currentConfig = await getFormConfig();
+
+  const systemPrompt = `You are an AI form designer for H.E.R LUXURY, a luxury perfume store.
+You manage the contact form design. The user gives you natural language instructions to modify the form.
+
+Current form config:
+${JSON.stringify(currentConfig, null, 2)}
+
+Return ONLY valid JSON with this structure:
+{
+  "action": "update_form" | "info" | "unknown",
+  "message": "friendly 1-2 sentence confirmation of what you changed",
+  "config": { ...the COMPLETE updated form config object }
+}
+
+Rules:
+- "config" must ALWAYS be the full config, not just the changed parts
+- Field types: "text", "email", "textarea", "select", "tel", "number"
+- Field widths: "full" or "half"
+- To add a field: add to fields array with id (snake_case), label, type, placeholder, required, width, and options (for select only)
+- To remove a field: exclude it from the fields array
+- To reorder fields: reorder the fields array
+- For select fields always provide an options array of strings
+- Keep the store's luxury brand tone in all copy
+- For "info" or "unknown" actions, still return the unchanged config`;
+
+  const response = await fetch('/api/groq', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userMessage }
+      ],
+      temperature: 0.2,
+      max_tokens: 1200
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API error ${response.status}`);
+  }
+
+  const data = await response.json();
+  const raw = data.choices[0].message.content.trim();
+  const result = JSON.parse(raw.replace(/```json\n?|\n?```/g, '').trim());
+
+  if (result.action === 'update_form' && result.config) {
+    await saveFormConfig(result.config);
+    return { success: true, message: result.message, config: result.config };
+  }
+  return { success: false, message: result.message || "I didn't understand that form design command." };
+}
+
+// ── Extended AI command to handle enquiries + form ─────
+
+async function processFullAICommand(userMessage) {
+  const products = await getProducts();
+  let enquiries = [];
+  try { enquiries = await getEnquiries() || []; } catch(e) {}
+
+  const systemPrompt = `You are the AI manager for H.E.R LUXURY. You manage products AND customer enquiries.
+
+Products: ${JSON.stringify(products.map(p => ({ id: p.id, name: p.name, price: p.price, in_stock: p.in_stock })))}
+
+Recent enquiries (last 10): ${JSON.stringify(enquiries.slice(0, 10).map(e => ({
+  id: e.id, name: e.first_name + ' ' + e.last_name, email: e.email,
+  type: e.enquiry_type, status: e.status, date: e.created_at?.split('T')[0], message: e.message?.substring(0, 80)
+})))}
+
+Respond with ONLY valid JSON:
+{
+  "action": "add"|"update"|"delete"|"info"|"update_enquiry"|"delete_enquiry"|"unknown",
+  "message": "friendly 1-2 sentence response",
+  "id": "product or enquiry id if needed",
+  "changes": { fields to change },
+  "product": { for add action }
+}
+
+For enquiry actions:
+- "update_enquiry": use id + changes (status: "unread"|"replied"|"archived", notes)
+- "delete_enquiry": use id
+- "info": answer questions about enquiries or products
+Match enquiries by name or email, case-insensitively.`;
+
+  const response = await fetch('/api/groq', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'llama-3.3-70b-versatile',
+      messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: userMessage }],
+      temperature: 0.2,
+      max_tokens: 600
+    })
+  });
+
+  if (!response.ok) throw new Error(`API error ${response.status}`);
+  const data = await response.json();
+  const raw = data.choices[0].message.content.trim();
+  const result = JSON.parse(raw.replace(/```json\n?|\n?```/g, '').trim());
+
+  switch (result.action) {
+    case 'add':
+      if (result.product) { const p = await addProduct(result.product); return { success: true, message: result.message, action: 'add' }; }
+      break;
+    case 'update':
+      if (result.id && result.changes) { await updateProduct(result.id, result.changes); return { success: true, message: result.message, action: 'update' }; }
+      break;
+    case 'delete':
+      if (result.id) { await deleteProduct(result.id); return { success: true, message: result.message, action: 'delete' }; }
+      break;
+    case 'update_enquiry':
+      if (result.id && result.changes) { await updateEnquiry(result.id, result.changes); return { success: true, message: result.message, action: 'update_enquiry' }; }
+      break;
+    case 'delete_enquiry':
+      if (result.id) { await deleteEnquiry(result.id); return { success: true, message: result.message, action: 'delete_enquiry' }; }
+      break;
+    case 'info':
+      return { success: true, message: result.message, action: 'info' };
+    default:
+      return { success: false, message: result.message || "I didn't understand that.", action: 'unknown' };
+  }
+  return { success: false, message: 'Something went wrong.', action: 'error' };
+}

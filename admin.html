@@ -206,6 +206,23 @@
 
     .confirm-btn:hover { background: var(--rose-dark); }
     .confirm-btn:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+    .enq-tab { background:none; border:none; border-right:1px solid var(--border); padding:0.5rem 1rem; font-family:'Jost',sans-serif; font-size:0.6rem; letter-spacing:0.15em; text-transform:uppercase; color:var(--text-dim); cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+    .enq-tab:last-child { border-right:none; }
+    .enq-tab:hover { color:var(--rose); background:var(--blush); }
+    .enq-tab.active { background:var(--rose); color:var(--white); }
+    .enq-status { font-size:0.52rem; letter-spacing:0.15em; text-transform:uppercase; padding:0.2rem 0.55rem; display:inline-block; }
+    .enq-status.unread { color:var(--rose-dark); border:1px solid var(--blush-deep); background:var(--blush); font-weight:500; }
+    .enq-status.replied { color:var(--green-soft); border:1px solid rgba(122,158,126,0.3); background:rgba(122,158,126,0.06); }
+    .enq-status.archived { color:var(--text-muted); border:1px solid var(--border); background:var(--cream); }
+    .enq-row-unread td { background:rgba(196,137,122,0.03); }
+    .enq-name { font-family:'Playfair Display',serif; font-size:0.95rem; color:var(--text); }
+    .enq-email { font-size:0.65rem; color:var(--text-dim); margin-top:1px; }
+    .preview-field { margin-bottom:0.8rem; }
+    .preview-label { font-size:0.52rem; letter-spacing:0.2em; text-transform:uppercase; color:var(--text-dim); margin-bottom:0.3rem; }
+    .preview-input { width:100%; border:1px solid var(--border); background:var(--ivory); padding:0.5rem 0.7rem; font-size:0.75rem; color:var(--text-mid); font-family:'Jost',sans-serif; }
+    .preview-grid { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; }
+    .preview-full { grid-column:1/-1; }
+    .preview-submit { width:100%; background:var(--text); color:white; border:none; padding:0.7rem; font-size:0.6rem; letter-spacing:0.25em; text-transform:uppercase; font-family:'Jost',sans-serif; margin-top:0.8rem; cursor:default; }
   </style>
 </head>
 <body class="admin-body">
@@ -243,6 +260,8 @@
         <li class="active" id="nav-dashboard"><button onclick="showPanel('dashboard')">◈ &nbsp;Dashboard</button></li>
         <li id="nav-upload"><button onclick="showPanel('upload')">⊕ &nbsp;Add via Image</button></li>
         <li id="nav-products"><button onclick="showPanel('products')">◇ &nbsp;Products</button></li>
+        <li id="nav-enquiries"><button onclick="showPanel('enquiries')">✉ &nbsp;Enquiries <span id="unreadBadge" style="display:none;background:var(--rose);color:white;font-size:0.5rem;padding:1px 5px;border-radius:10px;margin-left:4px;vertical-align:middle;"></span></button></li>
+        <li id="nav-form-designer"><button onclick="showPanel('form-designer')">✦ &nbsp;Form Designer</button></li>
         <li id="nav-ai"><button onclick="showPanel('ai')">✦ &nbsp;AI Manager</button></li>
         <li id="nav-settings"><button onclick="showPanel('settings')">◎ &nbsp;Settings</button></li>
       </ul>
@@ -457,6 +476,95 @@
         </div>
       </div>
 
+      <!-- ══ PANEL: ENQUIRIES ═══════════════════════════ -->
+      <div id="panel-enquiries" style="display:none;">
+
+        <!-- Stats row -->
+        <div class="stats-grid" id="enquiryStatsGrid" style="margin-bottom:2rem;"></div>
+
+        <!-- Filters toolbar -->
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;">
+          <div style="display:flex;gap:0;border:1px solid var(--border);overflow:hidden;" id="statusFilterTabs">
+            <button class="enq-tab active" onclick="setEnqFilter('status','all',this)">All</button>
+            <button class="enq-tab" onclick="setEnqFilter('status','unread',this)">Unread</button>
+            <button class="enq-tab" onclick="setEnqFilter('status','replied',this)">Replied</button>
+            <button class="enq-tab" onclick="setEnqFilter('status','archived',this)">Archived</button>
+          </div>
+          <select class="form-select" id="typeFilter" onchange="loadEnquiries()" style="font-size:0.65rem;padding:0.5rem 1rem;max-width:200px;">
+            <option value="all">All types</option>
+            <option value="Product order">Product order</option>
+            <option value="Bespoke / custom fragrance">Bespoke</option>
+            <option value="Wholesale enquiry">Wholesale</option>
+            <option value="Gift consultation">Gift</option>
+            <option value="Press & media">Press</option>
+            <option value="General question">General</option>
+          </select>
+          <button class="btn btn-danger" id="bulkDeleteBtn" onclick="bulkDeleteEnquiries()" style="display:none;font-size:0.6rem;">Delete selected</button>
+          <button class="btn btn-ghost" onclick="loadEnquiries()" style="font-size:0.6rem;margin-left:auto;">↺ Refresh</button>
+        </div>
+
+        <!-- Table -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <span class="admin-card-title">Customer Enquiries</span>
+            <span class="admin-card-count" id="enquiryCount"></span>
+          </div>
+          <div id="enquiriesTableWrap" style="overflow-x:auto;">
+            <table class="products-table" id="enquiriesTable">
+              <thead><tr>
+                <th style="width:36px;"><input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)" /></th>
+                <th>Customer</th><th>Type</th><th>Fragrance</th><th>Date</th><th>Status</th><th>Actions</th>
+              </tr></thead>
+              <tbody id="enquiriesBody"><tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--text-muted);font-size:0.78rem;">Loading enquiries…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ PANEL: FORM DESIGNER ═══════════════════════ -->
+      <div id="panel-form-designer" style="display:none;">
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start;">
+
+          <!-- AI Form Designer chat -->
+          <div class="ai-console">
+            <div class="ai-console-header">
+              <div class="ai-dot"></div>
+              <span class="ai-console-label">AI Form Designer <span>— Tell it how to change your form</span></span>
+            </div>
+            <div class="ai-messages" id="formAiMessages" style="min-height:200px;max-height:350px;">
+              <div class="msg ai">
+                <div class="msg-avatar">AI</div>
+                <div class="msg-text">I control the layout of your contact form. Tell me what to change and it updates live on the website.<br><br>Try: "Add a phone number field" or "Change the heading to Book a Consultation".</div>
+              </div>
+            </div>
+            <div class="ai-suggestions">
+              <button class="suggestion-chip" onclick="setFormAiInput(this.textContent)">Add a phone number field</button>
+              <button class="suggestion-chip" onclick="setFormAiInput(this.textContent)">Remove the fragrance field</button>
+              <button class="suggestion-chip" onclick="setFormAiInput(this.textContent)">Change heading to Book a Consultation</button>
+              <button class="suggestion-chip" onclick="setFormAiInput(this.textContent)">Add a Budget dropdown: Under £100, £100–£300, £300+</button>
+              <button class="suggestion-chip" onclick="setFormAiInput(this.textContent)">Make first name and last name one full-width Name field</button>
+              <button class="suggestion-chip" onclick="setFormAiInput(this.textContent)">Reset form to default</button>
+            </div>
+            <div class="ai-input-area">
+              <input type="text" class="ai-input" id="formAiInput" placeholder="Describe a change to the form…" onkeydown="if(event.key==='Enter') sendFormDesignCommand()" />
+              <button class="ai-send" onclick="sendFormDesignCommand()" id="formAiSendBtn">Send</button>
+            </div>
+          </div>
+
+          <!-- Live form preview -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <span class="admin-card-title">Live Preview</span>
+              <a href="contact.html" target="_blank" style="font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--rose);text-decoration:none;">Open page ↗</a>
+            </div>
+            <div style="padding:1.5rem;" id="formPreviewWrap">
+              <div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:0.72rem;">Loading preview…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- ══ PANEL: SETTINGS ════════════════════════════ -->
       <div id="panel-settings" style="display:none;">
         <div class="admin-card">
@@ -575,6 +683,7 @@
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('adminLayout').style.display = 'grid';
       renderDashboard();
+      loadUnreadBadge();
     }
 
     // Check session on load
@@ -586,8 +695,8 @@
 
     // ── PANEL NAVIGATION ─────────────────────────────
 
-    const panels = ['dashboard', 'upload', 'products', 'ai', 'settings'];
-    const titles = { dashboard: 'Dashboard', upload: 'Add via Image', products: 'Products', ai: 'AI Manager', settings: 'Settings' };
+    const panels = ['dashboard', 'upload', 'products', 'ai', 'enquiries', 'form-designer', 'settings'];
+    const titles = { dashboard: 'Dashboard', upload: 'Add via Image', products: 'Products', ai: 'AI Manager', enquiries: 'Enquiries', 'form-designer': 'Form Designer', settings: 'Settings' };
 
     function showPanel(name) {
       panels.forEach(p => {
@@ -598,7 +707,8 @@
       document.getElementById('pageTitle').textContent = titles[name];
       if (name === 'dashboard') renderDashboard();
       if (name === 'products') renderProductsTable();
-
+      if (name === 'enquiries') loadEnquiries();
+      if (name === 'form-designer') loadFormDesignerPreview();
       if (name === 'settings') loadSettings();
     }
 
@@ -952,6 +1062,263 @@
 
     function sendAICommand() { runAICommand('aiInput', 'aiMessages', 'aiSendBtn'); }
     function sendDashCommand() { runAICommand('dashAiInput', 'dashAiMessages', 'dashSendBtn'); }
+
+    // ══════════════════════════════════════════════════
+    //  ENQUIRY MANAGEMENT
+    // ══════════════════════════════════════════════════
+
+    let _enqFilter = { status: 'all', type: 'all' };
+    let _selectedEnquiries = new Set();
+    let _allEnquiries = [];
+
+    function setEnqFilter(key, val, btn) {
+      _enqFilter[key] = val;
+      if (btn) {
+        btn.closest('div').querySelectorAll('.enq-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      loadEnquiries();
+    }
+
+    async function loadEnquiries() {
+      try {
+        const typeVal = document.getElementById('typeFilter').value;
+        const opts = {};
+        if (_enqFilter.status !== 'all') opts.status = _enqFilter.status;
+        if (typeVal !== 'all') opts.type = typeVal;
+
+        _allEnquiries = await getEnquiries(opts) || [];
+        _selectedEnquiries.clear();
+        document.getElementById('bulkDeleteBtn').style.display = 'none';
+
+        // Stats
+        const stats = await getEnquiryStats();
+        document.getElementById('enquiryStatsGrid').innerHTML = `
+          <div class="stat-card"><div class="stat-card-label">Total</div><div class="stat-card-value">${stats.total}</div></div>
+          <div class="stat-card"><div class="stat-card-label">Unread</div><div class="stat-card-value" style="color:var(--rose)">${stats.unread}</div></div>
+          <div class="stat-card"><div class="stat-card-label">Replied</div><div class="stat-card-value">${stats.replied}</div></div>
+          <div class="stat-card"><div class="stat-card-label">Archived</div><div class="stat-card-value">${stats.archived}</div></div>`;
+
+        // Unread badge in sidebar
+        const badge = document.getElementById('unreadBadge');
+        if (stats.unread > 0) { badge.textContent = stats.unread; badge.style.display = 'inline'; }
+        else { badge.style.display = 'none'; }
+
+        document.getElementById('enquiryCount').textContent = `${_allEnquiries.length} enquir${_allEnquiries.length !== 1 ? 'ies' : 'y'}`;
+        renderEnquiriesTable(_allEnquiries);
+      } catch(err) {
+        document.getElementById('enquiriesBody').innerHTML = `<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--rose-dark);font-size:0.78rem;">Error loading enquiries: ${err.message}</td></tr>`;
+      }
+    }
+
+    function renderEnquiriesTable(enquiries) {
+      const tbody = document.getElementById('enquiriesBody');
+      if (!enquiries.length) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:3rem;color:var(--text-muted);font-size:0.78rem;">No enquiries found</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = enquiries.map(e => {
+        const date = e.created_at ? new Date(e.created_at).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }) : '—';
+        const isUnread = e.status === 'unread';
+        return `<tr class="${isUnread ? 'enq-row-unread' : ''}" onclick="openEnquiry('${e.id}')" style="cursor:pointer;">
+          <td onclick="event.stopPropagation()">
+            <input type="checkbox" onchange="toggleSelectEnquiry('${e.id}', this)" ${_selectedEnquiries.has(e.id) ? 'checked' : ''} />
+          </td>
+          <td>
+            <div class="enq-name">${e.first_name} ${e.last_name}${isUnread ? ' <span style="width:6px;height:6px;border-radius:50%;background:var(--rose);display:inline-block;vertical-align:middle;margin-left:4px;"></span>' : ''}</div>
+            <div class="enq-email">${e.email}</div>
+          </td>
+          <td><span style="font-size:0.65rem;color:var(--text-dim);">${e.enquiry_type || '—'}</span></td>
+          <td><span style="font-size:0.65rem;color:var(--text-dim);">${e.fragrance_interest || '—'}</span></td>
+          <td><span style="font-size:0.65rem;color:var(--text-muted);">${date}</span></td>
+          <td><span class="enq-status ${e.status}">${e.status}</span></td>
+          <td onclick="event.stopPropagation()" style="white-space:nowrap;">
+            <button class="btn btn-ghost" onclick="quickStatus('${e.id}','replied')" style="font-size:0.55rem;padding:0.25rem 0.6rem;margin-right:4px;">✓ Replied</button>
+            <button class="btn btn-danger" onclick="quickStatus('${e.id}','archived')" style="font-size:0.55rem;padding:0.25rem 0.6rem;">Archive</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function toggleSelectEnquiry(id, cb) {
+      if (cb.checked) _selectedEnquiries.add(id);
+      else _selectedEnquiries.delete(id);
+      document.getElementById('bulkDeleteBtn').style.display = _selectedEnquiries.size > 0 ? 'inline-block' : 'none';
+    }
+
+    function toggleSelectAll(cb) {
+      _allEnquiries.forEach(e => {
+        const el = document.querySelector(`input[onchange*="${e.id}"]`);
+        if (el) { el.checked = cb.checked; if (cb.checked) _selectedEnquiries.add(e.id); else _selectedEnquiries.delete(e.id); }
+      });
+      document.getElementById('bulkDeleteBtn').style.display = _selectedEnquiries.size > 0 ? 'inline-block' : 'none';
+    }
+
+    async function quickStatus(id, status) {
+      try {
+        await updateEnquiry(id, { status });
+        showToast(`Marked as ${status}`);
+        loadEnquiries();
+      } catch(err) { showToast('Failed to update', true); }
+    }
+
+    async function bulkDeleteEnquiries() {
+      if (!_selectedEnquiries.size) return;
+      if (!confirm(`Delete ${_selectedEnquiries.size} enquir${_selectedEnquiries.size !== 1 ? 'ies' : 'y'}? This cannot be undone.`)) return;
+      try {
+        await deleteEnquiries([..._selectedEnquiries]);
+        showToast(`${_selectedEnquiries.size} enquiries deleted`);
+        loadEnquiries();
+      } catch(err) { showToast('Failed to delete', true); }
+    }
+
+    // ── Enquiry detail modal ──────────────────────────
+    function openEnquiry(id) {
+      const e = _allEnquiries.find(x => x.id === id);
+      if (!e) return;
+
+      // Mark as read if unread
+      if (e.status === 'unread') { updateEnquiry(id, { status: 'unread' }); }
+
+      const date = e.created_at ? new Date(e.created_at).toLocaleString('en-GB') : '—';
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay open';
+      overlay.id = 'enqModal';
+      overlay.onclick = function(ev) { if (ev.target === this) closeEnqModal(); };
+      overlay.innerHTML = `
+        <div class="modal" style="max-width:600px;display:block;padding:0;">
+          <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <h3 class="modal-title" style="font-size:1.2rem;">${e.first_name} ${e.last_name}</h3>
+              <div style="font-size:0.65rem;color:var(--text-dim);margin-top:2px;">${e.email} · ${date}</div>
+            </div>
+            <button class="modal-close" onclick="closeEnqModal()">✕</button>
+          </div>
+          <div style="padding:1.5rem;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+              <div><div style="font-size:0.52rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.3rem;">Type</div><div style="font-size:0.82rem;color:var(--text-mid);">${e.enquiry_type||'—'}</div></div>
+              <div><div style="font-size:0.52rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.3rem;">Fragrance interest</div><div style="font-size:0.82rem;color:var(--text-mid);">${e.fragrance_interest||'—'}</div></div>
+              <div><div style="font-size:0.52rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.3rem;">Status</div><span class="enq-status ${e.status}">${e.status}</span></div>
+            </div>
+            <div style="background:var(--ivory);border:1px solid var(--border);padding:1.2rem;margin-bottom:1.5rem;">
+              <div style="font-size:0.52rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.6rem;">Message</div>
+              <p style="font-size:0.85rem;color:var(--text-mid);line-height:1.7;white-space:pre-wrap;">${e.message||''}</p>
+            </div>
+            <div style="margin-bottom:1.5rem;">
+              <div style="font-size:0.52rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--text-muted);margin-bottom:0.5rem;">Private notes</div>
+              <textarea id="enqNotes" class="form-textarea" style="min-height:70px;" placeholder="Add a private note…">${e.notes||''}</textarea>
+            </div>
+            <div style="display:flex;gap:0.8rem;flex-wrap:wrap;">
+              <a href="mailto:${e.email}?subject=Re: ${encodeURIComponent(e.enquiry_type||'Your enquiry')}" class="btn btn-primary" style="text-decoration:none;font-size:0.6rem;">✉ Reply via email</a>
+              <button class="btn btn-ghost" onclick="saveEnqNotes('${e.id}')" style="font-size:0.6rem;">Save notes</button>
+              <button class="btn btn-ghost" onclick="setEnqStatusModal('${e.id}','replied')" style="font-size:0.6rem;">✓ Mark replied</button>
+              <button class="btn btn-ghost" onclick="setEnqStatusModal('${e.id}','archived')" style="font-size:0.6rem;">Archive</button>
+              <button class="btn btn-danger" onclick="deleteEnqModal('${e.id}')" style="font-size:0.6rem;margin-left:auto;">Delete</button>
+            </div>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+    }
+
+    function closeEnqModal() {
+      const m = document.getElementById('enqModal');
+      if (m) m.remove();
+      loadEnquiries();
+    }
+
+    async function saveEnqNotes(id) {
+      const notes = document.getElementById('enqNotes').value;
+      await updateEnquiry(id, { notes });
+      showToast('Notes saved');
+    }
+
+    async function setEnqStatusModal(id, status) {
+      await updateEnquiry(id, { status });
+      showToast(`Marked as ${status}`);
+      closeEnqModal();
+    }
+
+    async function deleteEnqModal(id) {
+      if (!confirm('Delete this enquiry? This cannot be undone.')) return;
+      await deleteEnquiry(id);
+      showToast('Enquiry deleted');
+      closeEnqModal();
+    }
+
+    // ══════════════════════════════════════════════════
+    //  FORM DESIGNER
+    // ══════════════════════════════════════════════════
+
+    async function loadFormDesignerPreview() {
+      try {
+        const config = await getFormConfig();
+        renderFormPreview(config);
+      } catch(err) {
+        document.getElementById('formPreviewWrap').innerHTML = `<div style="color:var(--rose-dark);font-size:0.78rem;">Error loading form config</div>`;
+      }
+    }
+
+    function renderFormPreview(config) {
+      const fields = config.fields || [];
+      let html = `<div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--text);margin-bottom:0.3rem;">${config.heading||'Send an enquiry'}</div>
+        <div style="font-size:0.7rem;color:var(--text-dim);margin-bottom:1.2rem;">${config.subheading||''}</div>
+        <div class="preview-grid">`;
+      fields.forEach(f => {
+        const full = f.width !== 'half';
+        html += `<div class="${full ? 'preview-full' : ''}">
+          <div class="preview-label">${f.label}${f.required ? ' *' : ''}</div>
+          ${f.type === 'textarea'
+            ? `<textarea class="preview-input" style="min-height:60px;" disabled placeholder="${f.placeholder||''}"></textarea>`
+            : f.type === 'select'
+            ? `<select class="preview-input" disabled><option>${(f.options||[])[0]||'Select…'}</option></select>`
+            : `<input class="preview-input" type="${f.type}" disabled placeholder="${f.placeholder||''}" />`
+          }
+        </div>`;
+      });
+      html += `</div><button class="preview-submit">${config.submitLabel||'Send enquiry'}</button>`;
+      document.getElementById('formPreviewWrap').innerHTML = html;
+    }
+
+    function setFormAiInput(text) {
+      document.getElementById('formAiInput').value = text;
+      document.getElementById('formAiInput').focus();
+    }
+
+    async function sendFormDesignCommand() {
+      const input = document.getElementById('formAiInput');
+      const sendBtn = document.getElementById('formAiSendBtn');
+      const message = input.value.trim();
+      if (!message) return;
+
+      input.value = '';
+      sendBtn.disabled = true;
+      addMessage('formAiMessages', 'user', message);
+      addLoadingMessage('formAiMessages');
+
+      try {
+        const result = await processFormDesignCommand(message);
+        removeLoadingMessage();
+        addMessage('formAiMessages', 'ai', result.message, result.success ? 'success' : 'error');
+        if (result.success && result.config) {
+          renderFormPreview(result.config);
+          showToast('Form updated — changes are now live on contact.html');
+        }
+      } catch(err) {
+        removeLoadingMessage();
+        addMessage('formAiMessages', 'ai', `Error: ${err.message}`, 'error');
+        showToast('Form design error', true);
+      }
+      sendBtn.disabled = false;
+    }
+
+    // Load unread badge on init
+    async function loadUnreadBadge() {
+      try {
+        const stats = await getEnquiryStats();
+        const badge = document.getElementById('unreadBadge');
+        if (stats.unread > 0) { badge.textContent = stats.unread; badge.style.display = 'inline'; }
+      } catch(e) {}
+    }
 
   </script>
 </body>
